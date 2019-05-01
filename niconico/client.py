@@ -193,4 +193,6 @@ def filters_value(value):
         if value:
             return 'true'
         return 'false'
+    if value is None:
+        return 'null'
     return str(value)
