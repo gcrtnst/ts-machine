@@ -73,8 +73,8 @@ class Niconico:
         if not self.logged_in():
             self.login()
 
-    def ts_register(self, content_id):
-        vid = str(_int_id('lv', content_id))
+    def ts_register(self, live_id):
+        vid = str(_int_id('lv', live_id))
 
         # get token
         resp = self._session.post('https://live.nicovideo.jp/api/watchingreservation', data={
