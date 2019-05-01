@@ -131,7 +131,7 @@ class Niconico:
         if fields:
             data['fields'] = ','.join(fields)
         if filters:
-            data.update(filters_data(filters))
+            data.update(_filters_data(filters))
         if json_filter is not None:
             data['jsonFilter'] = json.dumps(json_filter, allow_nan=False)
         data['_sort'] = sort
@@ -172,21 +172,21 @@ def _int_id(prefix, content_id):
     raise InvalidContentID('invalid context id: {}'.format(content_id))
 
 
-def filters_data(filters):
+def _filters_data(filters):
     data = {}
     for field, value in filters.items():
         if isinstance(value, list):
             for i, v in enumerate(value):
-                data['filters[{}][{}]'.format(field, i + 1)] = filters_value(v)
+                data['filters[{}][{}]'.format(field, i + 1)] = _filters_value(v)
         elif isinstance(value, dict):
             for k, v in value.items():
-                data['filters[{}][{}]'.format(field, k)] = filters_value(v)
+                data['filters[{}][{}]'.format(field, k)] = _filters_value(v)
         else:
-            data['filters[{}][1]'.format(field)] = filters_value(value)
+            data['filters[{}][1]'.format(field)] = _filters_value(value)
     return data
 
 
-def filters_value(value):
+def _filters_value(value):
     if isinstance(value, datetime):
         return value.isoformat(timespec='seconds')
     if isinstance(value, bool):
