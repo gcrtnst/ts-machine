@@ -74,7 +74,7 @@ class Niconico:
             self.login()
 
     def ts_register(self, content_id):
-        vid = str(_int_live_id(content_id))
+        vid = str(_int_id('lv', content_id))
 
         # get token
         resp = self._session.post('https://live.nicovideo.jp/api/watchingreservation', data={
@@ -159,14 +159,6 @@ class Niconico:
         return resp_json
 
 
-def _int_live_id(content_id):
-    try:
-        return _int_id('lv', content_id)
-    except InvalidContentID:
-        pass
-    raise InvalidContentID('invalid live id: {}'.format(content_id))
-
-
 def _int_id(prefix, content_id):
     if isinstance(content_id, int):
         return content_id
@@ -177,7 +169,7 @@ def _int_id(prefix, content_id):
             return int(content_id)
         except ValueError:
             pass
-    raise InvalidContentID
+    raise InvalidContentID('invalid context id: {}'.format(content_id))
 
 
 def filters_data(filters):
