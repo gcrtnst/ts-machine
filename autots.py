@@ -8,6 +8,7 @@ from pathlib import Path
 import requests.utils
 import toml
 from dateutil.tz import gettz
+
 from niconico import (Niconico, TSAlreadyRegistered, TSReachedLimit,
                       TSRegistrationExpired)
 

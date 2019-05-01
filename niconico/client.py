@@ -125,7 +125,6 @@ class Niconico:
         return ts_list
 
     def contents_search(self, q, service='video', targets=['title', 'description', 'tags'], fields=[], filters={}, json_filter=None, sort='-viewCounter', offset=None, limit=None):
-        service = quote(service, safe='')
         data = {}
         data['q'] = q
         data['targets'] = ','.join(targets)
@@ -143,6 +142,7 @@ class Niconico:
         if self.context is not None:
             data['_context'] = self.context
 
+        service = quote(service, safe='')
         resp = self._session.post('https://api.search.nicovideo.jp/api/v2/' + service + '/contents/search', data=data)
         resp_json = json.loads(resp.text)
         if 'meta' not in resp_json:
