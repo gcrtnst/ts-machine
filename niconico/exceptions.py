@@ -34,6 +34,12 @@ class TSReachedLimit(NiconicoException):
     pass
 
 
+class VitaError(NiconicoException):
+    def __init__(self, *args, **kwargs):
+        self.code = kwargs.pop('code', None)
+        super().__init__(*args, **kwargs)
+
+
 class ContentSearchError(NiconicoException):
     def __init__(self, *args, **kwargs):
         self.code = kwargs.pop('code', None)
