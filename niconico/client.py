@@ -37,7 +37,7 @@ class Niconico:
         self._session.cookies = value
 
     def user_session(self):
-        for cookie in iter(self._session.cookies):
+        for cookie in iter(self.cookies):
             if cookie.name == 'user_session' and cookie.domain == '.nicovideo.jp':
                 return cookie.value
         return None
