@@ -81,6 +81,7 @@ class Niconico:
             'mode': 'watch_num',
             'vid': vid,
         })
+        resp.raise_for_status()
         match = re.search(r'ulck_\d+', resp.text)
         if not match:
             if resp.text.find('https://account.nicovideo.jp/login') != -1:
@@ -102,6 +103,7 @@ class Niconico:
             'vid': vid,
             'token': token,
         })
+        resp.raise_for_status()
         if resp.text.find('https://account.nicovideo.jp/login') != -1:
             raise LoginRequired('login is required for timeshift registration')
         if resp.text.find('regist_finished') == -1:
@@ -111,6 +113,7 @@ class Niconico:
         resp = self._session.post('https://live.nicovideo.jp/api/watchingreservation', data={
             'mode': 'list',
         })
+        resp.raise_for_status()
         root = ET.fromstring(resp.text)
         if 'status' not in root.attrib:
             raise InvalidResponse('failed to get timeshift list with invalid response')
