@@ -164,6 +164,17 @@ class Niconico:
                 d[key] = isoparse(d[key])
         return resp_json
 
+    def is_ppv_live(self, live_id, channel_id):
+        live_id = 'lv' + str(_int_id('lv', live_id))
+        live_id = quote(live_id, safe='')
+        channel_id = 'ch' + str(_int_id('ch', channel_id))
+        channel_id = quote(channel_id, safe='')
+        resp = self._session.get('https://ch.nicovideo.jp/ppv_live/{}/{}'.format(channel_id, live_id))
+        if resp.status_code == 404:
+            return False
+        resp.raise_for_status()
+        return True
+
 
 def _int_id(prefix, content_id):
     if isinstance(content_id, int):

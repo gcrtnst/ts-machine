@@ -90,7 +90,7 @@ def main():
             config['filters']['q'],
             service='live',
             targets=config['filters'].get('targets', ['title', 'description', 'tags']),
-            fields=['contentId', 'title'],
+            fields=['contentId', 'title', 'channelId'],
             filters=filters,
             sort=config['filters'].get('sort', '+startTime'),
             limit=20,
@@ -98,6 +98,10 @@ def main():
         for c in resp['data']:
             if c['contentId'] in ts_list:
                 continue
+            if 'ppv' in config['filters']:
+                is_ppv = c['channelId'] is not None and n.is_ppv_live(c['contentId'], c['channelId'])
+                if config['filters']['ppv'] != is_ppv:
+                    continue
             try:
                 if not argv.simulate:
                     n.ts_register(c['contentId'])
