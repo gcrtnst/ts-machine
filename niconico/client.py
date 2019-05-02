@@ -196,12 +196,12 @@ def _filters_data(filters):
     for field, value in filters.items():
         if isinstance(value, list):
             for i, v in enumerate(value):
-                data['filters[{}][{}]'.format(field, i + 1)] = _filters_value(v)
+                data['filters[' + field + '][' + str(i + 1) + ']'] = _filters_value(v)
         elif isinstance(value, dict):
             for k, v in value.items():
-                data['filters[{}][{}]'.format(field, k)] = _filters_value(v)
+                data['filters[' + field + '][' + k + ']'] = _filters_value(v)
         else:
-            data['filters[{}][1]'.format(field)] = _filters_value(value)
+            data['filters[' + field + '][1]'] = _filters_value(value)
     return data
 
 

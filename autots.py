@@ -110,7 +110,7 @@ def main():
             except (TSAlreadyRegistered, TSRegistrationExpired):
                 continue
             ts_list.append(c['contentId'])
-            print('reserved: {}: {}'.format(c['contentId'], c['title']))
+            print('reserved: ' + c['contentId'] + ': ' + c['title'])
 
 
 if __name__ == '__main__':
