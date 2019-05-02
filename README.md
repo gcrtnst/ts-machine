@@ -28,7 +28,7 @@ optional arguments:
 ||cookiejar|string|yes||クッキー保存先のファイル。LWPCookieJar を使用します。指定しなかった場合、実行するたびにログインを行います。|
 |filters|q|string|no||検索キーワード|
 ||targets|string array|yes|`["title", "description", "tags"]`|検索対象。[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)のフィールドを指定できます。キーワード検索の場合は`["title", "description", "tags"]`、タグ検索の場合は`["tagsExact"]`を指定してください。|
-||sort|string|yes|`"+startTime"`|タイムシフト予約の登録順序。[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)の _sort クエリパラメータと同様に指定してください。|
+||sort|string|yes|`"+startTime"`|タイムシフト予約の登録順序。[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)の \_sort クエリパラメータと同様に指定してください。|
 ||userId|integer array|yes||放送者のID|
 ||channelId|integer array|yes||チャンネルID|
 ||communityId|integer array|yes||コミュニティID|
