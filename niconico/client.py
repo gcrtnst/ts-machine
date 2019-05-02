@@ -165,11 +165,9 @@ class Niconico:
         return resp_json
 
     def is_ppv_live(self, live_id, channel_id):
-        live_id = 'lv' + str(_int_id('lv', live_id))
-        live_id = quote(live_id, safe='')
-        channel_id = 'ch' + str(_int_id('ch', channel_id))
-        channel_id = quote(channel_id, safe='')
-        resp = self._session.get('https://ch.nicovideo.jp/ppv_live/{}/{}'.format(channel_id, live_id))
+        live_id = _str_id('lv', live_id)
+        channel_id = _str_id('ch', channel_id)
+        resp = self._session.get('https://ch.nicovideo.jp/ppv_live/' + channel_id + '/' + live_id)
         if resp.status_code == 404:
             return False
         resp.raise_for_status()
@@ -187,6 +185,10 @@ def _int_id(prefix, content_id):
         except ValueError:
             pass
     raise InvalidContentID('invalid context id: {}'.format(content_id))
+
+
+def _str_id(prefix, content_id):
+    return prefix + str(_int_id(prefix, content_id))
 
 
 def _filters_data(filters):
