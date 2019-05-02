@@ -1,13 +1,13 @@
 # autots
 autots はニコニコ生放送のタイムシフト予約を自動化するためのツールです。
 ニコニコ生放送内を検索し、ヒットした番組をタイムシフト予約します。
-一般会員での利用を意図しています。
+一般会員での利用を想定しています。
 
 ## 使い方
 
   - 設定ファイルが必須です。
   - 実行すると設定された通りに検索を行い、ヒットした番組をタイムシフト予約します。
-  - cron で定期実行することを意図して制作しています。
+  - cron 等で定期実行することを意図して制作しています。
 
 ```
 usage: autots.py [-h] [-s] config
@@ -25,7 +25,7 @@ optional arguments:
 |:-|:-|:-|:-|:-|:-|
 |login|mail|string|no||メールアドレス|
 ||password|string|no||パスワード|
-||cookiejar|string|yes||クッキー保存先のファイル。LWPCookieJar を使用します。指定しなかった場合、実行するたびにログインを行います。|
+||cookiejar|string|yes||クッキー保存先のファイル。LWPCookieJar を使用します。|
 |filters|q|string|no||検索キーワード|
 ||targets|string array|yes|`["title", "description", "tags"]`|検索対象。[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)のフィールドを指定できます。キーワード検索の場合は`["title", "description", "tags"]`、タグ検索の場合は`["tagsExact"]`を指定してください。|
 ||sort|string|yes|`"+startTime"`|タイムシフト予約の登録順序。[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)の \_sort クエリパラメータと同様に指定してください。|
@@ -45,7 +45,7 @@ optional arguments:
 
 #### 設定例
 今から2時間以内に放送開始される、公式の将棋番組をタイムシフト予約する場合の設定。
-```
+```toml
 [login]
 mail = "email@example.com"
 password = "password"
@@ -61,8 +61,9 @@ startBefore = "2h"
   - タイムシフト登録数上限を超えた場合、何もエラーを出力せずに終了します。
   - 予約しようとした番組が既に予約済みだった場合、何もエラーを出力せずに次の番組の予約に移ります。
   - タイムシフト予約が申し込み期限切れだった場合、何もエラーを出力せずに次の番組の予約に移ります。
+  - その他のエラーが発生した場合、エラーを出力して強制終了します。
 
 ## 注意点
   - 設定ファイル及び cookiejar のパーミッションは適切に設定してください。
   - ニコニコ生放送のサーバーに過度な負荷を掛けないようにしてください。
-  - 自動実行する場合は、cookiejar を設定することをおすすめします。設定しない場合、他のブラウザソフト等でセッション切れが発生します。
+  - 自動実行する場合は、cookiejar を設定することをおすすめします。設定しない場合、他のブラウザソフト等でセッション切れが頻繁に起こります。
