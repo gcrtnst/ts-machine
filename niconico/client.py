@@ -133,7 +133,7 @@ class Niconico:
     def contents_search(self, q, service='video', targets=['title', 'description', 'tags'], fields=[], filters={}, json_filter=None, sort='-viewCounter', offset=None, limit=None):
         data = {}
         data['q'] = q
-        data['targets'] = ','.join(targets)
+        data['targets'] = ','.join((t.replace(',', '') for t in targets))
         if fields:
             data['fields'] = ','.join(fields)
         if filters:
