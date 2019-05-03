@@ -25,7 +25,7 @@ optional arguments:
 |:-|:-|:-|:-|:-|:-|
 |login|mail|string|no||メールアドレス|
 ||password|string|no||パスワード|
-||cookiejar|string|yes||クッキー保存先のファイル。LWPCookieJar を使用します。|
+||cookieJar|string|yes||クッキー保存先のファイル。LWPCookieJar を使用します。|
 |search|q|string|no||検索キーワード|
 ||targets|string array|yes|`["title", "description", "tags"]`|検索対象。[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)のフィールドを指定できます。キーワード検索の場合は`["title", "description", "tags"]`、タグ検索の場合は`["tagsExact"]`を指定してください。|
 ||sort|string|yes|`"+startTime"`|タイムシフト予約の登録順序。[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)の \_sort クエリパラメータと同様に指定してください。|
@@ -48,7 +48,7 @@ optional arguments:
 [login]
 mail = "email@example.com"
 password = "password"
-cookiejar = "/path/to/cookiejar"
+cookieJar = "/path/to/cookiejar"
 
 [search]
 q = "将棋"
@@ -63,6 +63,6 @@ startBefore = "2h"
   - その他のエラーが発生した場合、エラーを出力して強制終了します。
 
 ## 注意点
-  - 設定ファイル及び cookiejar のパーミッションは適切に設定してください。
+  - 設定ファイル及び cookieJar のパーミッションは適切に設定してください。
   - ニコニコ生放送のサーバーに過度な負荷を掛けないようにしてください。
-  - 自動実行する場合は、cookiejar を設定することをおすすめします。設定しない場合、他のブラウザソフト等でセッション切れが頻繁に起こります。
+  - 自動実行する場合は、cookieJar を設定することをおすすめします。設定しない場合、他のブラウザソフト等でセッション切れが頻繁に起こります。
