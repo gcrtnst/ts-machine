@@ -1,7 +1,7 @@
 import json
 import re
 import xml.etree.ElementTree as ET
-from datetime import datetime, timezone
+from datetime import datetime
 from urllib.parse import quote
 
 from dateutil.parser import isoparse
@@ -202,7 +202,7 @@ class Niconico:
     def server_time(self):
         resp = self._session.post('https://api.ce.nicovideo.jp/api/v1/system.unixtime')
         resp.raise_for_status()
-        return datetime.fromtimestamp(int(resp.text), tz=timezone.utc)
+        return datetime.fromtimestamp(int(resp.text), tz=gettz())
 
 
 def _int_id(prefix, content_id):
