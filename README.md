@@ -33,7 +33,7 @@ optional arguments:
 ||channelId|integer array|yes||チャンネルID|
 ||communityId|integer array|yes||コミュニティID|
 ||providerType|string array|yes||放送元種別(`"official"`, `"community"`, `"channel"`)|
-||tags|string|yes||タグ(空白区切り)|
+||tags|string array|yes||タグ|
 ||openBefore|string|yes||今から何時間以内に開場するか("1h30m" などの形式で指定)|
 ||openAfter|string|yes||今から何時間以降に開場するか("1h30m" などの形式で指定)|
 ||startBefore|string|yes||今から何時間以内に放送開始するか("1h30m" などの形式で指定)|
