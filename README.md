@@ -26,7 +26,7 @@ optional arguments:
 |login|mail|string|no||メールアドレス|
 ||password|string|no||パスワード|
 ||cookiejar|string|yes||クッキー保存先のファイル。LWPCookieJar を使用します。|
-|filters|q|string|no||検索キーワード|
+|search|q|string|no||検索キーワード|
 ||targets|string array|yes|`["title", "description", "tags"]`|検索対象。[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)のフィールドを指定できます。キーワード検索の場合は`["title", "description", "tags"]`、タグ検索の場合は`["tagsExact"]`を指定してください。|
 ||sort|string|yes|`"+startTime"`|タイムシフト予約の登録順序。[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)の \_sort クエリパラメータと同様に指定してください。|
 ||userId|integer array|yes||放送者のID|
@@ -50,7 +50,7 @@ mail = "email@example.com"
 password = "password"
 cookiejar = "/path/to/cookiejar"
 
-[filters]
+[search]
 q = "将棋"
 providerType = "official"
 startBefore = "2h"

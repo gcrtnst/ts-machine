@@ -59,47 +59,47 @@ def main():
         filters = {
             'timeshiftEnabled': True,
             'liveStatus': 'reserved',
-            'userId': config['filters'].get('userId', []),
-            'channelId': config['filters'].get('channelId', []),
-            'communityId': config['filters'].get('communityId', []),
-            'providerType': config['filters'].get('providerType', []),
-            'tags': config['filters'].get('tags', []),
+            'userId': config['search'].get('userId', []),
+            'channelId': config['search'].get('channelId', []),
+            'communityId': config['search'].get('communityId', []),
+            'providerType': config['search'].get('providerType', []),
+            'tags': config['search'].get('tags', []),
         }
 
         now = datetime.now(tz=gettz())
         filters['openTime'] = {}
         filters['startTime'] = {}
-        if 'openBefore' in config['filters']:
-            filters['openTime']['lte'] = now + parse_timedelta(config['filters']['openBefore'])
-        if 'openAfter' in config['filters']:
-            filters['openTime']['gte'] = now + parse_timedelta(config['filters']['openAfter'])
-        if 'startBefore' in config['filters']:
-            filters['startTime']['lte'] = now + parse_timedelta(config['filters']['startBefore'])
-        if 'startAfter' in config['filters']:
-            filters['startTime']['gte'] = now + parse_timedelta(config['filters']['startAfter'])
+        if 'openBefore' in config['search']:
+            filters['openTime']['lte'] = now + parse_timedelta(config['search']['openBefore'])
+        if 'openAfter' in config['search']:
+            filters['openTime']['gte'] = now + parse_timedelta(config['search']['openAfter'])
+        if 'startBefore' in config['search']:
+            filters['startTime']['lte'] = now + parse_timedelta(config['search']['startBefore'])
+        if 'startAfter' in config['search']:
+            filters['startTime']['gte'] = now + parse_timedelta(config['search']['startAfter'])
         else:
             filters['startTime']['gte'] = now + timedelta(minutes=30)
 
-        if 'scoreTimeshiftReserved' in config['filters']:
-            filters['scoreTimeshiftReserved'] = {'gte': config['filters']['scoreTimeshiftReserved']}
-        if 'memberOnly' in config['filters']:
-            filters['memberOnly'] = config['filters']['memberOnly']
+        if 'scoreTimeshiftReserved' in config['search']:
+            filters['scoreTimeshiftReserved'] = {'gte': config['search']['scoreTimeshiftReserved']}
+        if 'memberOnly' in config['search']:
+            filters['memberOnly'] = config['search']['memberOnly']
 
         resp = n.contents_search(
-            config['filters']['q'],
+            config['search']['q'],
             service='live',
-            targets=config['filters'].get('targets', ['title', 'description', 'tags']),
+            targets=config['search'].get('targets', ['title', 'description', 'tags']),
             fields=['contentId', 'title', 'channelId'],
             filters=filters,
-            sort=config['filters'].get('sort', '+startTime'),
+            sort=config['search'].get('sort', '+startTime'),
             limit=20,
         )
         for c in resp['data']:
             if c['contentId'] in ts_list:
                 continue
-            if 'ppv' in config['filters']:
+            if 'ppv' in config['search']:
                 is_ppv = c['channelId'] is not None and n.is_ppv_live(c['contentId'], c['channelId'])
-                if config['filters']['ppv'] != is_ppv:
+                if config['search']['ppv'] != is_ppv:
                     continue
             try:
                 if not argv.simulate:
