@@ -1,5 +1,5 @@
-# autots
-autots はニコニコ生放送のタイムシフト予約を自動化するためのツールです。
+# ts-machine
+ts-machine はニコニコ生放送のタイムシフト予約を自動化するためのツールです。
 ニコニコ生放送内を検索し、ヒットした番組をタイムシフト予約します。
 一般会員での利用を想定しています。
 
@@ -10,7 +10,7 @@ autots はニコニコ生放送のタイムシフト予約を自動化するた�
   - cron 等で定期的に実行することを意図して制作しています。
 
 ```
-usage: autots.py [-h] [-s] config
+usage: tsm.py [-h] [-s] config
 
 positional arguments:
   config          TOML-formatted configuration file

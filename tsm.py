@@ -42,7 +42,7 @@ def main():
 
     with lwp_cookiejar(filename=config['login'].get('cookieJar')) as jar:
         n = Niconico()
-        n.user_agent = requests.utils.default_user_agent() + ' autots (private app)'
+        n.user_agent = requests.utils.default_user_agent() + ' ts-machine (private app)'
         n.context = n.user_agent
         n.cookies = jar
 
