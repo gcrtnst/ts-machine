@@ -69,9 +69,9 @@ class Niconico:
         root = ET.fromstring(resp.text)
         if 'status' not in root.attrib:
             raise InvalidResponse('failed to ensure login with invalid response')
-        if root.get('status') == 'fail' and root.find('./error').text != 'NOSESSION':
+        if root.attrib['status'] == 'fail' and root.find('./error').text != 'NOSESSION':
             raise VitaError(root.find('./error/description'), code=root.find('./error/code'))
-        return root.get('status') == 'ok'
+        return root.attrib['status'] == 'ok'
 
     def ensure_login(self):
         if not self.logged_in():
