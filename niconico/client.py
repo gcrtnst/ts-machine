@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from urllib.parse import quote
 
 from dateutil.parser import isoparse
+from dateutil.tz import gettz
 from requests import Session
 
 from .exceptions import (ContentSearchError, InvalidContentID, InvalidResponse,
@@ -129,6 +130,31 @@ class Niconico:
         for vid in root[0].iter('vid'):
             ts_list.append('lv' + vid.text)
         return ts_list
+
+    def ts_detail_list(self):
+        resp = self._session.post('https://live.nicovideo.jp/api/watchingreservation', data={
+            'mode': 'detaillist',
+        })
+        resp.raise_for_status()
+        root = ET.fromstring(resp.text)
+        if 'status' not in root.attrib:
+            raise InvalidResponse('failed to get timeshift list with invalid response')
+        if root.attrib['status'] == 'fail':
+            raise LoginRequired('login is required to get timeshift list')
+        if root.attrib['status'] != 'ok':
+            raise InvalidResponse('failed to get timeshift list with unknown status ' + root.attrib['status'])
+
+        items = []
+        for xml_item in root.findall('./timeshift_reserved_detail_list/reserved_item'):
+            expire = int(xml_item.find('expire').text)
+            items.append({
+                'vid': 'lv' + xml_item.find('vid').text,
+                'title': xml_item.find('title').text,
+                'status': xml_item.find('status').text,
+                'unwatch': xml_item.find('unwatch').text != '0',
+                'expire': datetime.fromtimestamp(expire, tz=gettz()) if expire != 0 else None,
+            })
+        return items
 
     def contents_search(self, q, service='video', targets=['title', 'description', 'tags'], fields=[], filters={}, json_filter=None, sort='-viewCounter', offset=None, limit=None):
         data = {}
