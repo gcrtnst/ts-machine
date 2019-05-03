@@ -63,8 +63,8 @@ def main():
             'channelId': config['filters'].get('channelId', []),
             'communityId': config['filters'].get('communityId', []),
             'providerType': config['filters'].get('providerType', []),
-            'tags': [t.replace(' ', '_') for t in config['filters'].get('tags', [])],
-            'tagsExact': [t.replace(' ', '_') for t in config['filters'].get('tagsExact', [])],
+            'tags': config['filters'].get('tags', []),
+            'tagsExact': config['filters'].get('tagsExact', []),
         }
 
         now = datetime.now(tz=gettz())
