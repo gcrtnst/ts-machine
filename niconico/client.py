@@ -127,7 +127,7 @@ class Niconico:
             raise InvalidResponse('failed to get timeshift list with unknown status ' + root.attrib['status'])
 
         ts_list = []
-        for vid in root[0].iter('vid'):
+        for vid in root.iterfind('./timeshift_reserved_list/vid'):
             ts_list.append('lv' + vid.text)
         return ts_list
 
@@ -145,7 +145,7 @@ class Niconico:
             raise InvalidResponse('failed to get timeshift list with unknown status ' + root.attrib['status'])
 
         items = []
-        for xml_item in root.findall('./timeshift_reserved_detail_list/reserved_item'):
+        for xml_item in root.iterfind('./timeshift_reserved_detail_list/reserved_item'):
             expire = int(xml_item.find('expire').text)
             items.append({
                 'vid': 'lv' + xml_item.find('vid').text,
