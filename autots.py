@@ -64,7 +64,6 @@ def main():
             'communityId': config['filters'].get('communityId', []),
             'providerType': config['filters'].get('providerType', []),
             'tags': config['filters'].get('tags', []),
-            'tagsExact': config['filters'].get('tagsExact', []),
         }
 
         now = datetime.now(tz=gettz())
