@@ -1,13 +1,12 @@
 import re
 from argparse import ArgumentParser
 from contextlib import contextmanager
-from datetime import datetime, timedelta
+from datetime import timedelta
 from http.cookiejar import LWPCookieJar
 from pathlib import Path
 
 import requests.utils
 import toml
-from dateutil.tz import gettz
 
 from niconico import (Niconico, TSAlreadyRegistered, TSReachedLimit,
                       TSRegistrationExpired)
@@ -66,7 +65,7 @@ def main():
             'tags': config['search'].get('tags', []),
         }
 
-        now = datetime.now(tz=gettz())
+        now = n.server_time()
         filters['openTime'] = {}
         filters['startTime'] = {}
         if 'openBefore' in config['search']:
