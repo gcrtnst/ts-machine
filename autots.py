@@ -46,15 +46,7 @@ def main():
         n.context = n.user_agent
         n.cookies = jar
 
-        # login
-        n.mail = config['login']['mail']
-        n.password = config['login']['password']
-        n.ensure_login()
-
-        # ts_list
-        ts_list = n.ts_list()
-
-        # filters
+        # contents search
         filters = {
             'timeshiftEnabled': True,
             'liveStatus': 'reserved',
@@ -84,7 +76,7 @@ def main():
         if 'memberOnly' in config['search']:
             filters['memberOnly'] = config['search']['memberOnly']
 
-        resp = n.contents_search(
+        contents = n.contents_search(
             config['search']['q'],
             service='live',
             targets=config['search'].get('targets', ['title', 'description', 'tags']),
@@ -92,8 +84,19 @@ def main():
             filters=filters,
             sort=config['search'].get('sort', '+startTime'),
             limit=20,
-        )
-        for c in resp['data']:
+        )['data']
+        if not contents:
+            return
+
+        # login
+        n.mail = config['login']['mail']
+        n.password = config['login']['password']
+        n.ensure_login()
+
+        # ts_list
+        ts_list = n.ts_list()
+
+        for c in contents:
             if c['contentId'] in ts_list:
                 continue
             if 'ppv' in config['search']:
