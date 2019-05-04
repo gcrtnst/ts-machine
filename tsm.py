@@ -43,9 +43,11 @@ def main():
 
     with lwp_cookiejar(filename=config['login'].get('cookieJar')) as jar:
         n = Niconico()
+        n.mail = config['login']['mail']
+        n.password = config['login']['password']
+        n.cookies = jar
         n.user_agent = requests.utils.default_user_agent() + ' ts-machine (private app)'
         n.context = n.user_agent
-        n.cookies = jar
 
         # contents search
         filters = {
@@ -90,11 +92,6 @@ def main():
         except StopIteration:
             return
         contents = chain([first_content], contents)
-
-        # login
-        n.mail = config['login']['mail']
-        n.password = config['login']['password']
-        n.ensure_login()
 
         # ts_list
         ts_list = n.ts_list()

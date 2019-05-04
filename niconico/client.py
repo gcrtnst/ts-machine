@@ -2,6 +2,7 @@ import json
 import re
 import xml.etree.ElementTree as ET
 from datetime import datetime
+from functools import wraps
 from urllib.parse import quote
 
 from dateutil.parser import isoparse
@@ -10,8 +11,23 @@ from requests import Session
 
 from .exceptions import (ContentSearchError, InvalidContentID, InvalidResponse,
                          LoginFailed, LoginRequired, TSAlreadyRegistered,
-                         TSNotSupported, TSReachedLimit, TSRegistrationExpired,
-                         VitaError)
+                         TSNotSupported, TSReachedLimit, TSRegistrationExpired)
+
+
+def _login_if_required(func):
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        try:
+            return func(self, *args, **kwargs)
+        except LoginRequired:
+            if self.mail is None or self.password is None:
+                raise
+            self.login()
+        try:
+            return func(self, *args, **kwargs)
+        except LoginRequired:
+            raise LoginFailed
+    return wrapper
 
 
 class Niconico:
@@ -58,25 +74,7 @@ class Niconico:
         if self.user_session() is None:
             raise LoginFailed('mail or password is incorrect')
 
-    def logged_in(self):
-        user_session = self.user_session()
-        if user_session is None:
-            return False
-
-        resp = self._session.post('https://api.ce.nicovideo.jp/api/v1/session.alive',
-                                  data={'__format': 'xml'},
-                                  headers={'X-Nicovita-Session': user_session})
-        root = ET.fromstring(resp.text)
-        if 'status' not in root.attrib:
-            raise InvalidResponse('failed to ensure login with invalid response')
-        if root.attrib['status'] == 'fail' and root.find('./error').text != 'NOSESSION':
-            raise VitaError(root.find('./error/description'), code=root.find('./error/code'))
-        return root.attrib['status'] == 'ok'
-
-    def ensure_login(self):
-        if not self.logged_in():
-            self.login()
-
+    @_login_if_required
     def ts_register(self, live_id):
         vid = str(_int_id('lv', live_id))
 
@@ -113,6 +111,7 @@ class Niconico:
         if resp.text.find('regist_finished') == -1:
             raise InvalidResponse('failed to register timeshift with invalid response')
 
+    @_login_if_required
     def ts_list(self):
         resp = self._session.post('https://live.nicovideo.jp/api/watchingreservation', data={
             'mode': 'list',
@@ -131,6 +130,7 @@ class Niconico:
             ts_list.append('lv' + vid.text)
         return ts_list
 
+    @_login_if_required
     def ts_detail_list(self):
         resp = self._session.post('https://live.nicovideo.jp/api/watchingreservation', data={
             'mode': 'detaillist',
