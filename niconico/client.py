@@ -155,24 +155,6 @@ class Niconico:
             raise InvalidResponse('failed to register timeshift with invalid response')
 
     @_login_if_required
-    def ts_list(self):
-        resp = self._session.post('https://live.nicovideo.jp/api/watchingreservation', data={
-            'mode': 'list',
-        })
-        root = ET.fromstring(resp.text)
-        if 'status' not in root.attrib:
-            raise InvalidResponse('failed to get timeshift list with invalid response')
-        if root.attrib['status'] == 'fail':
-            raise LoginRequired('login is required to get timeshift list')
-        if root.attrib['status'] != 'ok':
-            raise InvalidResponse('failed to get timeshift list with unknown status ' + root.attrib['status'])
-
-        ts_list = []
-        for vid in root.iterfind('./timeshift_reserved_list/vid'):
-            ts_list.append('lv' + vid.text)
-        return ts_list
-
-    @_login_if_required
     def ts_detail_list(self):
         resp = self._session.post('https://live.nicovideo.jp/api/watchingreservation', data={
             'mode': 'detaillist',
