@@ -73,7 +73,7 @@ class TSMachine:
             filters['scoreTimeshiftReserved'] = {'gte': self.filters['scoreTimeshiftReserved']}
         return filters
 
-    def iter_unreserved(self, fields={'contentId'}):
+    def iter_reserve(self, fields={'contentId'}):
         search_fields = {'contentId', 'title', 'channelId'} | set(fields)
         iter_search = self._niconico.contents_search(
             self.filters['q'],
@@ -100,7 +100,7 @@ class TSMachine:
             yield {k: v for k, v in content.items() if k in fields}
 
     def run(self):
-        for content in self.iter_unreserved(fields={'contentId', 'title'}):
+        for content in self.iter_reserve(fields={'contentId', 'title'}):
             try:
                 if not self.simulate:
                     self._niconico.ts_register(content['contentId'])
