@@ -116,7 +116,6 @@ class Niconico:
         resp = self._session.post('https://live.nicovideo.jp/api/watchingreservation', data={
             'mode': 'list',
         })
-        resp.raise_for_status()
         root = ET.fromstring(resp.text)
         if 'status' not in root.attrib:
             raise InvalidResponse('failed to get timeshift list with invalid response')
@@ -135,7 +134,6 @@ class Niconico:
         resp = self._session.post('https://live.nicovideo.jp/api/watchingreservation', data={
             'mode': 'detaillist',
         })
-        resp.raise_for_status()
         root = ET.fromstring(resp.text)
         if 'status' not in root.attrib:
             raise InvalidResponse('failed to get timeshift list with invalid response')
