@@ -83,8 +83,8 @@ def main():
             fields=['contentId', 'title', 'channelId'],
             filters=filters,
             sort=config['search'].get('sort', '+startTime'),
-            limit=10,
-        )['data']
+        )
+        contents = list(contents)
         if not contents:
             return
 

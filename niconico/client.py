@@ -156,39 +156,44 @@ class Niconico:
             })
         return items
 
-    def contents_search(self, q, service='video', targets=['title', 'description', 'tags'], fields=[], filters={}, json_filter=None, sort='-viewCounter', offset=None, limit=None):
-        data = {}
-        data['q'] = q
-        data['targets'] = ','.join((t.replace(',', '') for t in targets))
+    def contents_search(self, q, service='video', targets=['title', 'description', 'tags'], fields=[], filters={}, json_filter=None, sort='-viewCounter'):
+        service = quote(service, safe='')
+        data = {
+            'q': q,
+            'targets': ','.join((t.replace(',', '') for t in targets)),
+            '_sort': sort,
+            '_offset': 0,
+        }
         if fields:
             data['fields'] = ','.join(fields)
         if filters:
             data.update(_filters_data(filters))
         if json_filter is not None:
             data['jsonFilter'] = json.dumps(json_filter, allow_nan=False)
-        data['_sort'] = sort
-        if offset is not None:
-            data['_offset'] = offset
-        if limit is not None:
-            data['_limit'] = limit
         if self.context is not None:
             data['_context'] = self.context
 
-        service = quote(service, safe='')
-        resp = self._session.post('https://api.search.nicovideo.jp/api/v2/' + service + '/contents/search', data=data)
-        resp_json = json.loads(resp.text)
-        if 'meta' not in resp_json:
-            raise InvalidResponse('contents search failed with invalid response')
-        if resp_json['meta']['status'] != 200:
-            raise ContentSearchError(resp_json['meta']['errorMessage'], code=resp_json['meta']['errorCode'])
+        total = 1600
+        while data['_offset'] < total:
+            resp = self._session.post('https://api.search.nicovideo.jp/api/v2/' + service + '/contents/search', data=data)
+            resp_json = json.loads(resp.text)
+            if 'meta' not in resp_json:
+                raise InvalidResponse('contents search failed with invalid response')
+            if resp_json['meta']['status'] != 200:
+                raise ContentSearchError(resp_json['meta']['errorMessage'], code=resp_json['meta']['errorCode'])
+            if not resp_json['data']:
+                break
 
-        # parse ISO-8601 datetime string
-        for d in resp_json['data']:
-            for key in d:
-                if key != 'startTime' and key != 'openTime':
-                    continue
-                d[key] = isoparse(d[key])
-        return resp_json
+            for content in resp_json['data']:
+                if 'startTime' in content:
+                    content['startTime'] = isoparse(content['startTime'])
+                if 'openTime' in content:
+                    content['openTime'] = isoparse(content['openTime'])
+                yield content
+
+            data['_offset'] += len(resp_json['data'])
+            if resp_json['meta']['totalCount'] < total:
+                total = resp_json['meta']['totalCount']
 
     def is_ppv_live(self, live_id, channel_id):
         live_id = _str_id('lv', live_id)
