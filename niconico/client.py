@@ -30,6 +30,49 @@ def _login_if_required(func):
     return wrapper
 
 
+def _int_id(prefix, content_id):
+    if isinstance(content_id, int):
+        return content_id
+    elif isinstance(content_id, str):
+        try:
+            if prefix and content_id.startswith(prefix):
+                return int(content_id[len(prefix):])
+            return int(content_id)
+        except ValueError:
+            pass
+    raise InvalidContentID('invalid context id: {}'.format(content_id))
+
+
+def _str_id(prefix, content_id):
+    return prefix + str(_int_id(prefix, content_id))
+
+
+def _filters_data(filters):
+    data = {}
+    for field, value in filters.items():
+        if isinstance(value, list):
+            for i, v in enumerate(value):
+                data['filters[' + field + '][' + str(i + 1) + ']'] = _filters_value(v)
+        elif isinstance(value, dict):
+            for k, v in value.items():
+                data['filters[' + field + '][' + k + ']'] = _filters_value(v)
+        else:
+            data['filters[' + field + '][1]'] = _filters_value(value)
+    return data
+
+
+def _filters_value(value):
+    if isinstance(value, datetime):
+        return value.isoformat(timespec='seconds')
+    if isinstance(value, bool):
+        if value:
+            return 'true'
+        return 'false'
+    if value is None:
+        return 'null'
+    return str(value)
+
+
 class Niconico:
     def __init__(self):
         self.mail = None
@@ -206,46 +249,3 @@ class Niconico:
         resp = self._session.post('https://api.ce.nicovideo.jp/api/v1/system.unixtime')
         resp.raise_for_status()
         return datetime.fromtimestamp(int(resp.text), tz=gettz())
-
-
-def _int_id(prefix, content_id):
-    if isinstance(content_id, int):
-        return content_id
-    elif isinstance(content_id, str):
-        try:
-            if prefix and content_id.startswith(prefix):
-                return int(content_id[len(prefix):])
-            return int(content_id)
-        except ValueError:
-            pass
-    raise InvalidContentID('invalid context id: {}'.format(content_id))
-
-
-def _str_id(prefix, content_id):
-    return prefix + str(_int_id(prefix, content_id))
-
-
-def _filters_data(filters):
-    data = {}
-    for field, value in filters.items():
-        if isinstance(value, list):
-            for i, v in enumerate(value):
-                data['filters[' + field + '][' + str(i + 1) + ']'] = _filters_value(v)
-        elif isinstance(value, dict):
-            for k, v in value.items():
-                data['filters[' + field + '][' + k + ']'] = _filters_value(v)
-        else:
-            data['filters[' + field + '][1]'] = _filters_value(value)
-    return data
-
-
-def _filters_value(value):
-    if isinstance(value, datetime):
-        return value.isoformat(timespec='seconds')
-    if isinstance(value, bool):
-        if value:
-            return 'true'
-        return 'false'
-    if value is None:
-        return 'null'
-    return str(value)
