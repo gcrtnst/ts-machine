@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 from contextlib import contextmanager
 from datetime import timedelta
 from http.cookiejar import LWPCookieJar
+from itertools import chain
 from pathlib import Path
 
 import requests.utils
@@ -83,10 +84,12 @@ def main():
             fields=['contentId', 'title', 'channelId'],
             filters=filters,
             sort=config['search'].get('sort', '+startTime'),
-        )
-        contents = list(contents)
-        if not contents:
+        ).__iter__()
+        try:
+            first_content = contents.__next__()
+        except StopIteration:
             return
+        contents = chain([first_content], contents)
 
         # login
         n.mail = config['login']['mail']
