@@ -156,7 +156,7 @@ class Niconico:
             })
         return items
 
-    def contents_search(self, q, service='video', targets=['title', 'description', 'tags'], fields=[], filters={}, json_filter=None, sort='-viewCounter'):
+    def contents_search(self, q, service='video', targets=['title', 'description', 'tags'], fields=set(), filters={}, json_filter=None, sort='-viewCounter'):
         service = quote(service, safe='')
         data = {
             'q': q,
