@@ -155,7 +155,7 @@ class Niconico:
             raise InvalidResponse('failed to register timeshift with invalid response')
 
     @_login_if_required
-    def ts_detail_list(self):
+    def ts_list(self):
         resp = self._session.post('https://live.nicovideo.jp/api/watchingreservation', data={
             'mode': 'detaillist',
         })

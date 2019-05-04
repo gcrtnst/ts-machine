@@ -36,17 +36,17 @@ class TSMachine:
         if cookies is not None:
             self._niconico.cookies = cookies
 
-        self._ts_detail_list = None
+        self._ts_list = None
 
     @property
-    def ts_detail_list(self):
-        if self._ts_detail_list is None:
-            self._ts_detail_list = self._niconico.ts_detail_list()
-        return self._ts_detail_list
+    def ts_list(self):
+        if self._ts_list is None:
+            self._ts_list = self._niconico.ts_list()
+        return self._ts_list
 
-    @ts_detail_list.setter
-    def ts_detail_list(self, value):
-        self._ts_detail_list = value
+    @ts_list.setter
+    def ts_list(self, value):
+        self._ts_list = value
 
     def contents_search_filters(self, now=None):
         if now is None:
@@ -91,7 +91,7 @@ class TSMachine:
         iter_search = chain([content], iter_search)
 
         for content in iter_search:
-            if content['contentId'] in (ts['vid'] for ts in self.ts_detail_list):
+            if content['contentId'] in (ts['vid'] for ts in self.ts_list):
                 continue
             if 'ppv' in self.filters:
                 is_ppv = content['channelId'] is not None and self._niconico.is_ppv_live(content['contentId'], content['channelId'])
@@ -109,7 +109,7 @@ class TSMachine:
             except (TSAlreadyRegistered, TSRegistrationExpired):
                 continue
             print('reserved: ' + content['contentId'] + ': ' + content['title'], file=self.stdout)
-            self.ts_detail_list.append({
+            self.ts_list.append({
                 'vid': content['contentId'],
                 'title': content['title'],
                 'status': 'RESERVED',
