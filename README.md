@@ -26,6 +26,7 @@ optional arguments:
 |login|mail|string|no||メールアドレス|
 ||password|string|no||パスワード|
 ||cookieJar|string|yes||クッキー保存先のファイル。LWPCookieJar を使用します。|
+|timeshift|limit|int|yes|`10`|タイムシフト予約総数の上限|
 |search|q|string|no||検索キーワード|
 ||targets|string array|yes|`["title", "description", "tags"]`|検索対象。[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)のフィールドを指定できます。キーワード検索の場合は`["title", "description", "tags"]`、タグ検索の場合は`["tagsExact"]`を指定してください。|
 ||sort|string|yes|`"+startTime"`|タイムシフト予約の登録順序。[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)の \_sort クエリパラメータと同様に指定してください。|
@@ -41,7 +42,6 @@ optional arguments:
 ||scoreTimeshiftReserved|integer|yes||タイムシフト予約者数の下限|
 ||memberOnly|bool|yes||チャンネル・コミュニティ限定か|
 ||ppv|bool|yes||有料放送か(ネットチケットが必要か)|
-|timeshift|limit|int|yes|`10`|予約件数の上限|
 
 #### 設定例
 今から2時間以内に放送開始される、公式の将棋番組をタイムシフト予約する場合の設定。
