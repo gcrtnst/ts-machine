@@ -1,11 +1,11 @@
+import contextlib
+import itertools
 import re
+import sys
 from argparse import ArgumentParser
-from contextlib import contextmanager
 from datetime import timedelta
 from http.cookiejar import LWPCookieJar
-from itertools import chain, takewhile
 from pathlib import Path
-from sys import stdout
 
 import requests.utils
 import toml
@@ -30,7 +30,7 @@ class TSMachine:
         self.filters = {}
         self.limit = None
         self.simulate = False
-        self.stdout = stdout
+        self.stdout = sys.stdout
         self._ts_list = None
 
     @property
@@ -107,7 +107,7 @@ class TSMachine:
             content = iter_search.__next__()
         except StopIteration:
             return
-        iter_search = chain([content], iter_search)
+        iter_search = itertools.chain([content], iter_search)
 
         for content in iter_search:
             if content['contentId'] in (ts['vid'] for ts in self.ts_list):
@@ -121,7 +121,7 @@ class TSMachine:
     def run(self):
         iter_reserve = self.iter_reserve(fields={'contentId', 'title'})
         if self.limit is not None:
-            iter_reserve = takewhile(lambda _: len(self.ts_list) < self.limit, iter_reserve)
+            iter_reserve = itertools.takewhile(lambda _: len(self.ts_list) < self.limit, iter_reserve)
 
         for content in iter_reserve:
             try:
@@ -139,7 +139,7 @@ class TSMachine:
             })
 
 
-@contextmanager
+@contextlib.contextmanager
 def lwp_cookiejar(*args, **kwargs):
     jar = LWPCookieJar(*args, **kwargs)
     if jar.filename is not None and Path(jar.filename).is_file():

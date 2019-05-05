@@ -1,12 +1,12 @@
+import functools
 import json
 import re
+import urllib.parse
 import xml.etree.ElementTree as ET
 from datetime import datetime
-from functools import wraps
-from urllib.parse import quote
 
-from dateutil.parser import isoparse
-from dateutil.tz import gettz
+import dateutil.parser
+import dateutil.tz
 from requests import Session
 
 from .exceptions import (ContentSearchError, InvalidContentID, InvalidResponse,
@@ -15,7 +15,7 @@ from .exceptions import (ContentSearchError, InvalidContentID, InvalidResponse,
 
 
 def _login_if_required(func):
-    @wraps(func)
+    @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
         try:
             return func(self, *args, **kwargs)
@@ -175,12 +175,12 @@ class Niconico:
                 'title': xml_item.find('title').text,
                 'status': xml_item.find('status').text,
                 'unwatch': xml_item.find('unwatch').text != '0',
-                'expire': datetime.fromtimestamp(expire, tz=gettz()) if expire != 0 else None,
+                'expire': datetime.fromtimestamp(expire, tz=dateutil.tz.gettz()) if expire != 0 else None,
             })
         return items
 
     def contents_search(self, q, service='video', targets=['title', 'description', 'tags'], fields=set(), filters={}, json_filter=None, sort='-viewCounter'):
-        service = quote(service, safe='')
+        service = urllib.parse.quote(service, safe='')
         data = {
             'q': q,
             'targets': ','.join((t.replace(',', '') for t in targets)),
@@ -209,9 +209,9 @@ class Niconico:
 
             for content in resp_json['data']:
                 if 'startTime' in content:
-                    content['startTime'] = isoparse(content['startTime'])
+                    content['startTime'] = dateutil.parser.isoparse(content['startTime'])
                 if 'openTime' in content:
-                    content['openTime'] = isoparse(content['openTime'])
+                    content['openTime'] = dateutil.parser.isoparse(content['openTime'])
                 yield content
 
             data['_offset'] += len(resp_json['data'])
@@ -230,4 +230,4 @@ class Niconico:
     def server_time(self):
         resp = self._session.post('https://api.ce.nicovideo.jp/api/v1/system.unixtime')
         resp.raise_for_status()
-        return datetime.fromtimestamp(int(resp.text), tz=gettz())
+        return datetime.fromtimestamp(int(resp.text), tz=dateutil.tz.gettz())
