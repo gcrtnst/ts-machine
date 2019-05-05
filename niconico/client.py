@@ -52,16 +52,16 @@ def _contents_search_filters_data(filters):
     for field, value in filters.items():
         if isinstance(value, list):
             for i, v in enumerate(value):
-                data['filters[' + field + '][' + str(i + 1) + ']'] = _filters_value(v)
+                data['filters[' + field + '][' + str(i + 1) + ']'] = _contents_search_filters_value(v)
         elif isinstance(value, dict):
             for k, v in value.items():
-                data['filters[' + field + '][' + k + ']'] = _filters_value(v)
+                data['filters[' + field + '][' + k + ']'] = _contents_search_filters_value(v)
         else:
-            data['filters[' + field + '][1]'] = _filters_value(value)
+            data['filters[' + field + '][1]'] = _contents_search_filters_value(value)
     return data
 
 
-def _filters_value(value):
+def _contents_search_filters_value(value):
     if isinstance(value, datetime):
         return value.isoformat(timespec='seconds')
     if isinstance(value, bool):
