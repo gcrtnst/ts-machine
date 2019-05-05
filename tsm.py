@@ -27,8 +27,8 @@ class TSMachine:
         self._niconico.user_agent = requests.utils.default_user_agent() + ' ts-machine (private app)'
         self._niconico.context = self._niconico.user_agent
 
-        self.filters = {}
         self.limit = None
+        self.filters = {}
         self.simulate = False
         self.stdout = sys.stdout
         self._ts_list = None
@@ -159,19 +159,19 @@ def main():
 
     with argv.config.open() as f:
         config = toml.load(f)
+    config['timeshift'] = config.get('timeshift', {})
+    config['timeshift']['limit'] = config['timeshift'].get('limit', 10)
     config['search']['targets'] = config['search'].get('targets', ['title', 'description', 'tags'])
     config['search']['sort'] = config['search'].get('sort', '+startTime')
     config['search']['startAfter'] = config['search'].get('startAfter', '30m')
-    config['timeshift'] = config.get('timeshift', {})
-    config['timeshift']['limit'] = config['timeshift'].get('limit', 10)
 
     with lwp_cookiejar(filename=config['login'].get('cookieJar')) as jar:
         tsm = TSMachine()
         tsm.mail = config['login']['mail']
         tsm.password = config['login']['password']
         tsm.cookies = jar
-        tsm.filters = config['search']
         tsm.limit = config['timeshift']['limit']
+        tsm.filters = config['search']
         tsm.simulate = argv.simulate
         tsm.run()
 
