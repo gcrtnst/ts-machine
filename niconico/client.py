@@ -47,7 +47,7 @@ def _str_id(prefix, content_id):
     return prefix + str(_int_id(prefix, content_id))
 
 
-def _filters_data(filters):
+def _contents_search_filters_data(filters):
     data = {}
     for field, value in filters.items():
         if isinstance(value, list):
@@ -190,7 +190,7 @@ class Niconico:
         if fields:
             data['fields'] = ','.join(fields)
         if filters:
-            data.update(_filters_data(filters))
+            data.update(_contents_search_filters_data(filters))
         if json_filter is not None:
             data['jsonFilter'] = json.dumps(json_filter, allow_nan=False)
         if self.context is not None:
