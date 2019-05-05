@@ -41,6 +41,7 @@ optional arguments:
 ||scoreTimeshiftReserved|integer|yes||タイムシフト予約者数の下限|
 ||memberOnly|bool|yes||チャンネル・コミュニティ限定か|
 ||ppv|bool|yes||有料放送か(ネットチケットが必要か)|
+|timeshift|limit|int|yes|`10`|予約件数の上限|
 
 #### 設定例
 今から2時間以内に放送開始される、公式の将棋番組をタイムシフト予約する場合の設定。

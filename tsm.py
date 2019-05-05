@@ -3,15 +3,14 @@ from argparse import ArgumentParser
 from contextlib import contextmanager
 from datetime import timedelta
 from http.cookiejar import LWPCookieJar
-from itertools import chain
+from itertools import chain, takewhile
 from pathlib import Path
 from sys import stdout
 
 import requests.utils
 import toml
 
-from niconico import (Niconico, TSAlreadyRegistered, TSReachedLimit,
-                      TSRegistrationExpired)
+from niconico import Niconico, TSAlreadyRegistered, TSRegistrationExpired
 
 
 def parse_timedelta(s):
@@ -29,6 +28,7 @@ class TSMachine:
         self._niconico.context = self._niconico.user_agent
 
         self.filters = {}
+        self.limit = None
         self.simulate = False
         self.stdout = stdout
         self._ts_list = None
@@ -119,12 +119,14 @@ class TSMachine:
             yield {k: v for k, v in content.items() if k in fields}
 
     def run(self):
-        for content in self.iter_reserve(fields={'contentId', 'title'}):
+        iter_reserve = self.iter_reserve(fields={'contentId', 'title'})
+        if self.limit is not None:
+            iter_reserve = takewhile(lambda _: len(self.ts_list) < self.limit, iter_reserve)
+
+        for content in iter_reserve:
             try:
                 if not self.simulate:
                     self._niconico.ts_register(content['contentId'])
-            except TSReachedLimit:
-                return
             except (TSAlreadyRegistered, TSRegistrationExpired):
                 continue
             print('reserved: ' + content['contentId'] + ': ' + content['title'], file=self.stdout)
@@ -160,6 +162,8 @@ def main():
     config['search']['targets'] = config['search'].get('targets', ['title', 'description', 'tags'])
     config['search']['sort'] = config['search'].get('sort', '+startTime')
     config['search']['startAfter'] = config['search'].get('startAfter', '30m')
+    config['timeshift'] = config.get('timeshift', {})
+    config['timeshift']['limit'] = config['timeshift'].get('limit', 10)
 
     with lwp_cookiejar(filename=config['login'].get('cookieJar')) as jar:
         tsm = TSMachine()
@@ -167,6 +171,7 @@ def main():
         tsm.password = config['login']['password']
         tsm.cookies = jar
         tsm.filters = config['search']
+        tsm.limit = config['timeshift']['limit']
         tsm.simulate = argv.simulate
         tsm.run()
 
