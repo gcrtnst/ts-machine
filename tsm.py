@@ -23,20 +23,39 @@ def parse_timedelta(s):
 
 
 class TSMachine:
-    def __init__(self, mail, password, filters, cookies=None, simulate=False, stdout=stdout):
-        self.filters = filters
-        self.simulate = simulate
-        self.stdout = stdout
-
+    def __init__(self):
         self._niconico = Niconico()
-        self._niconico.mail = mail
-        self._niconico.password = password
         self._niconico.user_agent = requests.utils.default_user_agent() + ' ts-machine (private app)'
         self._niconico.context = self._niconico.user_agent
-        if cookies is not None:
-            self._niconico.cookies = cookies
 
+        self.filters = {}
+        self.simulate = False
+        self.stdout = stdout
         self._ts_list = None
+
+    @property
+    def mail(self):
+        return self._niconico.mail
+
+    @mail.setter
+    def mail(self, value):
+        self._niconico.mail = value
+
+    @property
+    def password(self):
+        return self._niconico.password
+
+    @password.setter
+    def password(self, value):
+        self._niconico.password = value
+
+    @property
+    def cookies(self):
+        return self._niconico.cookies
+
+    @cookies.setter
+    def cookies(self, value):
+        self._niconico.cookies = value
 
     @property
     def ts_list(self):
@@ -143,7 +162,13 @@ def main():
     config['search']['startAfter'] = config['search'].get('startAfter', '30m')
 
     with lwp_cookiejar(filename=config['login'].get('cookieJar')) as jar:
-        TSMachine(config['login']['mail'], config['login']['password'], config['search'], cookies=jar, simulate=argv.simulate).run()
+        tsm = TSMachine()
+        tsm.mail = config['login']['mail']
+        tsm.password = config['login']['password']
+        tsm.cookies = jar
+        tsm.filters = config['search']
+        tsm.simulate = argv.simulate
+        tsm.run()
 
 
 if __name__ == '__main__':
