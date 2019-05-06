@@ -101,13 +101,7 @@ class TSMachine:
             fields=search_fields,
             filters=self.contents_search_filters(),
             sort=self.filters['sort'],
-        ).__iter__()
-
-        try:
-            content = iter_search.__next__()
-        except StopIteration:
-            return
-        iter_search = itertools.chain([content], iter_search)
+        )
 
         for content in iter_search:
             if content['contentId'] in (ts['vid'] for ts in self.ts_list):
