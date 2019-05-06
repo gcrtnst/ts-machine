@@ -9,9 +9,10 @@ import dateutil.parser
 import dateutil.tz
 from requests import Session
 
-from .exceptions import (ContentSearchError, InvalidContentID, InvalidResponse,
-                         LoginFailed, LoginRequired, TSAlreadyRegistered,
-                         TSNotSupported, TSReachedLimit, TSRegistrationExpired)
+from . import utils
+from .exceptions import (ContentSearchError, InvalidResponse, LoginFailed,
+                         LoginRequired, TSAlreadyRegistered, TSNotSupported,
+                         TSReachedLimit, TSRegistrationExpired)
 
 
 def _login_if_required(func):
@@ -28,23 +29,6 @@ def _login_if_required(func):
         except LoginRequired:
             raise LoginFailed
     return wrapper
-
-
-def _int_id(prefix, content_id):
-    if isinstance(content_id, int):
-        return content_id
-    elif isinstance(content_id, str):
-        try:
-            if prefix and content_id.startswith(prefix):
-                return int(content_id[len(prefix):])
-            return int(content_id)
-        except ValueError:
-            pass
-    raise InvalidContentID('invalid context id: {}'.format(content_id))
-
-
-def _str_id(prefix, content_id):
-    return prefix + str(_int_id(prefix, content_id))
 
 
 def _contents_search_filters_data(filters):
@@ -119,7 +103,7 @@ class Niconico:
 
     @_login_if_required
     def ts_register(self, live_id):
-        vid = str(_int_id('lv', live_id))
+        vid = str(utils.int_id('lv', live_id))
 
         # get token
         resp = self._session.post('https://live.nicovideo.jp/api/watchingreservation', data={
@@ -219,8 +203,8 @@ class Niconico:
                 total = resp_json['meta']['totalCount']
 
     def is_ppv_live(self, live_id, channel_id):
-        live_id = _str_id('lv', live_id)
-        channel_id = _str_id('ch', channel_id)
+        live_id = utils.str_id('lv', live_id)
+        channel_id = utils.str_id('ch', channel_id)
         resp = self._session.get('https://ch.nicovideo.jp/ppv_live/' + channel_id + '/' + live_id)
         if resp.status_code == 404:
             return False
