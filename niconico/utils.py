@@ -1,3 +1,5 @@
+import re
+
 from .exceptions import InvalidContentID
 
 
@@ -5,12 +7,12 @@ def int_id(prefix, content_id):
     if isinstance(content_id, int):
         return content_id
     elif isinstance(content_id, str):
-        try:
-            if prefix and content_id.startswith(prefix):
-                return int(content_id[len(prefix):])
-            return int(content_id)
-        except ValueError:
-            pass
+        match = re.search(r'^(?P<prefix>[a-z]+)?(?P<id>[0-9]+)$', content_id)
+        if match:
+            match_prefix = match.group('prefix')
+            if match_prefix and match_prefix != prefix:
+                raise InvalidContentID('expected "' + prefix + '" for content id prefix, found "' + match_prefix + '"')
+            return int(match.group('id'))
     raise InvalidContentID('invalid context id: {}'.format(content_id))
 
 
