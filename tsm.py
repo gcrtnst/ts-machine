@@ -63,7 +63,7 @@ class TSMachine:
         return self._ts_list
 
     def ts_register(self, live_id):
-        if self.simulate:
+        if not self.simulate:
             self._niconico.ts_register(live_id)
         if self._ts_list is not None:
             self._ts_list.append(live_id)
