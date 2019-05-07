@@ -6,6 +6,7 @@ from argparse import ArgumentParser
 from datetime import timedelta
 from http.cookiejar import LWPCookieJar
 from pathlib import Path
+from types import MappingProxyTypes
 
 import requests.utils
 import toml
@@ -57,15 +58,10 @@ class TSMachine:
     def cookies(self, value):
         self._niconico.cookies = value
 
-    @property
     def ts_list(self):
         if self._ts_list is None:
             self._ts_list = self._niconico.ts_list()
-        return self._ts_list
-
-    @ts_list.setter
-    def ts_list(self, value):
-        self._ts_list = value
+        return MappingProxyTypes(self._ts_list)
 
     def contents_search_filters(self, now=None):
         if now is None:
@@ -104,7 +100,7 @@ class TSMachine:
         )
 
         for content in iter_search:
-            if content['contentId'] in (ts['vid'] for ts in self.ts_list):
+            if content['contentId'] in (ts['vid'] for ts in self.ts_list()):
                 continue
             if 'ppv' in self.filters:
                 is_ppv = content['channelId'] is not None and self._niconico.is_ppv_live(content['contentId'], content['channelId'])
@@ -115,7 +111,7 @@ class TSMachine:
     def run(self):
         iter_reserve = self.iter_reserve(fields={'contentId', 'title'})
         if self.limit is not None:
-            iter_reserve = itertools.takewhile(lambda _: len(self.ts_list) < self.limit, iter_reserve)
+            iter_reserve = itertools.takewhile(lambda _: len(self.ts_list()) < self.limit, iter_reserve)
 
         for content in iter_reserve:
             try:
@@ -124,7 +120,7 @@ class TSMachine:
             except (TSAlreadyRegistered, TSRegistrationExpired):
                 continue
             print('reserved: ' + content['contentId'] + ': ' + content['title'], file=self.stdout)
-            self.ts_list.append({
+            self._ts_list.append({
                 'vid': content['contentId'],
                 'title': content['title'],
                 'status': 'RESERVED',
