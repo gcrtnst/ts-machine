@@ -153,8 +153,8 @@ def main():
 
     with argv.config.open() as f:
         config = toml.load(f)
-    config['timeshift'] = config.get('timeshift', {})
-    config['timeshift']['limit'] = config['timeshift'].get('limit', 10)
+    config['misc'] = config.get('misc', {})
+    config['misc']['timeshiftLimit'] = config['misc'].get('timeshiftLimit', 10)
     config['search']['targets'] = config['search'].get('targets', ['title', 'description', 'tags'])
     config['search']['sort'] = config['search'].get('sort', '+startTime')
     config['search']['startAfter'] = config['search'].get('startAfter', '30m')
@@ -164,7 +164,7 @@ def main():
         tsm.mail = config['login']['mail']
         tsm.password = config['login']['password']
         tsm.cookies = jar
-        tsm.limit = config['timeshift']['limit']
+        tsm.limit = config['misc']['timeshiftLimit']
         tsm.filters = config['search']
         tsm.simulate = argv.simulate
         tsm.run()
