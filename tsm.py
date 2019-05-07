@@ -6,7 +6,6 @@ from argparse import ArgumentParser
 from datetime import timedelta
 from http.cookiejar import LWPCookieJar
 from pathlib import Path
-from types import MappingProxyTypes
 
 import requests.utils
 import toml
@@ -61,7 +60,7 @@ class TSMachine:
     def ts_list(self):
         if self._ts_list is None:
             self._ts_list = self._niconico.ts_list()
-        return MappingProxyTypes(self._ts_list)
+        return self._ts_list
 
     def ts_register(self, live_id):
         if self.simulate:
