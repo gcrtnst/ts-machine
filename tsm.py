@@ -63,6 +63,12 @@ class TSMachine:
             self._ts_list = self._niconico.ts_list()
         return MappingProxyTypes(self._ts_list)
 
+    def ts_register(self, live_id):
+        if self.simulate:
+            self._niconico.ts_register(live_id)
+        if self._ts_list is not None:
+            self._ts_list.append(live_id)
+
     def contents_search_filters(self, now=None):
         if now is None:
             now = self._niconico.server_time()
@@ -115,12 +121,10 @@ class TSMachine:
 
         for content in iter_reserve:
             try:
-                if not self.simulate:
-                    self._niconico.ts_register(content['contentId'])
+                self.ts_register(content['contentId'])
             except (TSAlreadyRegistered, TSRegistrationExpired):
                 continue
             print('reserved: ' + content['contentId'] + ': ' + content['title'], file=self.stdout)
-            self._ts_list.append(content['contentId'])
 
 
 @contextlib.contextmanager
