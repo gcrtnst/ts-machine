@@ -100,7 +100,7 @@ class TSMachine:
         )
 
         for content in iter_search:
-            if content['contentId'] in (ts['vid'] for ts in self.ts_list()):
+            if content['contentId'] in self.ts_list():
                 continue
             if 'ppv' in self.filters:
                 is_ppv = content['channelId'] is not None and self._niconico.is_ppv_live(content['contentId'], content['channelId'])
@@ -120,13 +120,7 @@ class TSMachine:
             except (TSAlreadyRegistered, TSRegistrationExpired):
                 continue
             print('reserved: ' + content['contentId'] + ': ' + content['title'], file=self.stdout)
-            self._ts_list.append({
-                'vid': content['contentId'],
-                'title': content['title'],
-                'status': 'RESERVED',
-                'unwatch': False,
-                'expire': None,
-            })
+            self._ts_list.append(content['contentId'])
 
 
 @contextlib.contextmanager
