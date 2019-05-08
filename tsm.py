@@ -167,8 +167,8 @@ def main():
         tsm.password = config['login']['password']
         tsm.cookies = jar
         tsm.timeout = config['misc']['timeout']
-        tsm.limit = config['misc']['timeshiftLimit']
         tsm.filters = config['search']
+        tsm.limit = config['misc']['timeshiftLimit']
         tsm.simulate = argv.simulate
         tsm.run()
 
