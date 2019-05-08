@@ -27,8 +27,8 @@ class TSMachine:
         self._niconico.user_agent = requests.utils.default_user_agent() + ' ts-machine (private app)'
         self._niconico.context = self._niconico.user_agent
 
-        self.limit = None
         self.filters = {}
+        self.limit = None
         self.simulate = False
         self.stdout = sys.stdout
         self._ts_list = None
@@ -154,12 +154,12 @@ def main():
 
     with argv.config.open() as f:
         config = toml.load(f)
-    config['misc'] = config.get('misc', {})
-    config['misc']['timeout'] = config['misc'].get('timeout', 300)
-    config['misc']['timeshiftLimit'] = config['misc'].get('timeshiftLimit', 10)
     config['search']['targets'] = config['search'].get('targets', ['title', 'description', 'tags'])
     config['search']['sort'] = config['search'].get('sort', '+startTime')
     config['search']['startAfter'] = config['search'].get('startAfter', '30m')
+    config['misc'] = config.get('misc', {})
+    config['misc']['timeout'] = config['misc'].get('timeout', 300)
+    config['misc']['timeshiftLimit'] = config['misc'].get('timeshiftLimit', 10)
 
     with lwp_cookiejar(filename=config['login'].get('cookieJar')) as jar:
         tsm = TSMachine()
