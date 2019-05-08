@@ -57,6 +57,14 @@ class TSMachine:
     def cookies(self, value):
         self._niconico.cookies = value
 
+    @property
+    def timeout(self):
+        return self._niconico.timeout
+
+    @timeout.setter
+    def timeout(self, value):
+        self._niconico.timeout = value
+
     def ts_list(self):
         if self._ts_list is None:
             self._ts_list = self._niconico.ts_list()
@@ -147,6 +155,7 @@ def main():
     with argv.config.open() as f:
         config = toml.load(f)
     config['misc'] = config.get('misc', {})
+    config['misc']['timeout'] = config['misc'].get('timeout', 300)
     config['misc']['timeshiftLimit'] = config['misc'].get('timeshiftLimit', 10)
     config['search']['targets'] = config['search'].get('targets', ['title', 'description', 'tags'])
     config['search']['sort'] = config['search'].get('sort', '+startTime')
@@ -157,6 +166,7 @@ def main():
         tsm.mail = config['login']['mail']
         tsm.password = config['login']['password']
         tsm.cookies = jar
+        tsm.timeout = config['misc']['timeout']
         tsm.limit = config['misc']['timeshiftLimit']
         tsm.filters = config['search']
         tsm.simulate = argv.simulate

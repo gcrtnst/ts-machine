@@ -62,6 +62,7 @@ class Niconico:
         self.mail = None
         self.password = None
         self.context = None
+        self.timeout = None
         self._session = Session()
         self._session.headers = {}
 
@@ -87,14 +88,22 @@ class Niconico:
                 return cookie.value
         return None
 
+    def _http_get(self, *args, **kwargs):
+        kwargs['timeout'] = kwargs.get('timeout', self.timeout)
+        return self._session.get(*args, **kwargs)
+
+    def _http_post(self, *args, **kwargs):
+        kwargs['timeout'] = kwargs.get('timeout', self.timeout)
+        return self._session.post(*args, **kwargs)
+
     def logout(self):
-        self._session.get('https://secure.nicovideo.jp/secure/logout')
+        self._http_get('https://secure.nicovideo.jp/secure/logout')
 
     def login(self):
         if self.mail is None or self.password is None:
             raise LoginFailed('mail or password not provided')
 
-        self._session.post('https://account.nicovideo.jp/api/v1/login', data={
+        self._http_post('https://account.nicovideo.jp/api/v1/login', data={
             'mail_tel': self.mail,
             'password': self.password,
         })
@@ -106,7 +115,7 @@ class Niconico:
         vid = str(utils.int_id('lv', live_id))
 
         # get token
-        resp = self._session.post('https://live.nicovideo.jp/api/watchingreservation', data={
+        resp = self._http_post('https://live.nicovideo.jp/api/watchingreservation', data={
             'mode': 'watch_num',
             'vid': vid,
         })
@@ -127,7 +136,7 @@ class Niconico:
         token = match.group(0)
 
         # register
-        resp = self._session.post('https://live.nicovideo.jp/api/watchingreservation', data={
+        resp = self._http_post('https://live.nicovideo.jp/api/watchingreservation', data={
             'mode': 'regist',
             'vid': vid,
             'token': token,
@@ -140,7 +149,7 @@ class Niconico:
 
     @_login_if_required
     def ts_list(self):
-        resp = self._session.post('https://live.nicovideo.jp/api/watchingreservation', data={
+        resp = self._http_post('https://live.nicovideo.jp/api/watchingreservation', data={
             'mode': 'list',
         })
         root = ET.fromstring(resp.text)
@@ -171,7 +180,7 @@ class Niconico:
 
         total = 1600
         while data['_offset'] < total:
-            resp = self._session.post('https://api.search.nicovideo.jp/api/v2/' + service + '/contents/search', data=data)
+            resp = self._http_post('https://api.search.nicovideo.jp/api/v2/' + service + '/contents/search', data=data)
             resp_json = json.loads(resp.text)
             if 'meta' not in resp_json:
                 raise InvalidResponse('contents search failed with invalid response')
@@ -194,13 +203,13 @@ class Niconico:
     def is_ppv_live(self, live_id, channel_id):
         live_id = utils.str_id('lv', live_id)
         channel_id = utils.str_id('ch', channel_id)
-        resp = self._session.get('https://ch.nicovideo.jp/ppv_live/' + channel_id + '/' + live_id)
+        resp = self._http_get('https://ch.nicovideo.jp/ppv_live/' + channel_id + '/' + live_id)
         if resp.status_code == 404:
             return False
         resp.raise_for_status()
         return True
 
     def server_time(self):
-        resp = self._session.post('https://api.ce.nicovideo.jp/api/v1/system.unixtime')
+        resp = self._http_post('https://api.ce.nicovideo.jp/api/v1/system.unixtime')
         resp.raise_for_status()
         return datetime.fromtimestamp(int(resp.text), tz=dateutil.tz.gettz())
