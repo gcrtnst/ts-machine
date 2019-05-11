@@ -101,7 +101,7 @@ class TSMachine:
             filters['scoreTimeshiftReserved'] = {'gte': self.filters['scoreTimeshiftReserved']}
         return filters
 
-    def iter_reserve(self, fields={'contentId'}):
+    def iter_unreserved(self, fields={'contentId'}):
         search_fields = {'contentId', 'title', 'channelId'} | set(fields)
         iter_search = self._niconico.contents_search(
             self.filters['q'],
@@ -122,11 +122,11 @@ class TSMachine:
             yield {k: v for k, v in content.items() if k in fields}
 
     def run(self):
-        iter_reserve = self.iter_reserve(fields={'contentId', 'title'})
+        iter_unreserved = self.iter_unreserved(fields={'contentId', 'title'})
         if self.limit is not None:
-            iter_reserve = itertools.takewhile(lambda _: len(self.ts_list()) < self.limit, iter_reserve)
+            iter_unreserved = itertools.takewhile(lambda _: len(self.ts_list()) < self.limit, iter_unreserved)
 
-        for content in iter_reserve:
+        for content in iter_unreserved:
             try:
                 self.ts_register(content['contentId'])
             except (TSAlreadyRegistered, TSRegistrationExpired):
