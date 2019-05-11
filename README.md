@@ -41,7 +41,7 @@ optional arguments:
 ||scoreTimeshiftReserved|integer|yes||タイムシフト予約者数の下限|
 ||memberOnly|bool|yes||チャンネル・コミュニティ限定か|
 ||ppv|bool|yes||有料放送か(ネットチケットが必要か)|
-|misc|timeout|integer or float|yes|`300`|サーバーからレスポンスが送られなくなってから指定秒数経過すると処理を中断します。|
+|misc|timeout|integer or float|yes|`300`|サーバーのレスポンスが受信できなくなってから指定秒数経過すると処理を中断します。|
 ||timeshiftLimit|integer|yes|`10`|タイムシフト予約総数の上限|
 
 #### 設定例
