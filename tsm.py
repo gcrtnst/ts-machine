@@ -1,5 +1,4 @@
 import contextlib
-import itertools
 import re
 import sys
 from argparse import ArgumentParser
@@ -19,6 +18,15 @@ def parse_timedelta(s):
         raise ValueError('invalid timedelta: "{}"'.format(s))
     kwargs = {name: int(value) for (name, value) in match.groupdict().items() if value is not None}
     return timedelta(**kwargs)
+
+
+def iter_takewhile(func, p):
+    p = p.__iter__()
+    while func():
+        try:
+            yield p.__next__()
+        except StopIteration:
+            return
 
 
 class TSMachine:
@@ -128,7 +136,7 @@ class TSMachine:
     def run(self):
         iter_unreserved = self.iter_unreserved(fields={'contentId', 'title'})
         if self.limit is not None:
-            iter_unreserved = itertools.takewhile(lambda _: len(self.ts_list()) < self.limit, iter_unreserved)
+            iter_unreserved = iter_takewhile(lambda: len(self.ts_list()) < self.limit, iter_unreserved)
 
         for content in iter_unreserved:
             try:
