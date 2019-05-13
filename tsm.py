@@ -74,19 +74,19 @@ class TSMachine:
         self._niconico.timeout = value
 
     def ts_list(self):
-        if self.simulate:
-            if self._simulated_ts_list is None:
-                self._simulated_ts_list = self._niconico.ts_list()
-            return self._simulated_ts_list[:]
-        return self._niconico.ts_list()
+        if not self.simulate:
+            return self._niconico.ts_list()
+        if self._simulated_ts_list is None:
+            self._simulated_ts_list = self._niconico.ts_list()
+        return self._simulated_ts_list[:]
 
     def ts_register(self, live_id):
-        if self.simulate:
-            if self._simulated_ts_list is None:
-                self._simulated_ts_list = self._niconico.ts_list()
-            self._simulated_ts_list.append(live_id)
+        if not self.simulate:
+            self._niconico.ts_register(live_id)
             return
-        self._niconico.ts_register(live_id)
+        if self._simulated_ts_list is None:
+            self._simulated_ts_list = self._niconico.ts_list()
+        self._simulated_ts_list.append(live_id)
 
     def contents_search_filters(self, now=None):
         if now is None:
