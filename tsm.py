@@ -9,6 +9,7 @@ from pathlib import Path
 import requests.utils
 import toml
 
+import niconico.utils
 from niconico import Niconico, TSAlreadyRegistered, TSRegistrationExpired
 
 
@@ -86,6 +87,7 @@ class TSMachine:
             return
         if self._simulated_ts_list is None:
             self._simulated_ts_list = self._niconico.ts_list()
+        live_id = niconico.utils.str_id('lv', live_id)
         if live_id in self._simulated_ts_list:
             raise TSAlreadyRegistered('timeshift already registered for ' + live_id)
         self._simulated_ts_list.append(live_id)
