@@ -174,8 +174,8 @@ def main():
     config['search']['sort'] = config['search'].get('sort', '+startTime')
     config['search']['startAfter'] = config['search'].get('startAfter', '30m')
     config['misc'] = config.get('misc', {})
+    config['misc']['limit'] = config['misc'].get('limit', 10)
     config['misc']['timeout'] = config['misc'].get('timeout', 300)
-    config['misc']['timeshiftLimit'] = config['misc'].get('timeshiftLimit', 10)
 
     with lwp_cookiejar(filename=config['login'].get('cookieJar')) as jar:
         tsm = TSMachine()
@@ -184,7 +184,7 @@ def main():
         tsm.cookies = jar
         tsm.timeout = config['misc']['timeout']
         tsm.filters = config['search']
-        tsm.limit = config['misc']['timeshiftLimit']
+        tsm.limit = config['misc']['limit']
         tsm.simulate = argv.simulate
         tsm.run()
 
