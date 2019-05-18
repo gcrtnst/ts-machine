@@ -122,17 +122,17 @@ class Niconico:
         resp.raise_for_status()
         match = re.search(r'ulck_\d+', resp.text)
         if not match:
-            if resp.text.find('https://account.nicovideo.jp/login') != -1:
+            if 'https://account.nicovideo.jp/login' in resp.text:
                 raise LoginRequired('login is required for timeshift registration')
-            if resp.text.find('\u5bfe\u8c61\u756a\u7d44\u306f\u3042\u308a\u307e\u305b\u3093\u3002') != -1 or resp.text.find('\u30b7\u30b9\u30c6\u30e0\u30a8\u30e9\u30fc') != -1:
+            if '\u5bfe\u8c61\u756a\u7d44\u306f\u3042\u308a\u307e\u305b\u3093\u3002' in resp.text or '\u30b7\u30b9\u30c6\u30e0\u30a8\u30e9\u30fc' in resp.text:
                 raise NotFound('lv' + vid + ' not found')
-            if resp.text.find('\u3053\u306e\u756a\u7d44\u306f\u30bf\u30a4\u30e0\u30b7\u30d5\u30c8\u306b\u5bfe\u5fdc\u3057\u3066\u3044\u307e\u305b\u3093\u3002') != -1:
+            if '\u3053\u306e\u756a\u7d44\u306f\u30bf\u30a4\u30e0\u30b7\u30d5\u30c8\u306b\u5bfe\u5fdc\u3057\u3066\u3044\u307e\u305b\u3093\u3002' in resp.text:
                 raise TSNotSupported('timeshift is not supported for lv' + vid)
-            if resp.text.find('http://live.nicovideo.jp/my') != -1:
+            if 'http://live.nicovideo.jp/my' in resp.text:
                 raise TSAlreadyRegistered('timeshift already registered for lv' + vid)
-            if resp.text.find('\u7533\u3057\u8fbc\u307f\u671f\u9650\u5207\u308c\u3067\u3059\u3002') != -1:
+            if '\u7533\u3057\u8fbc\u307f\u671f\u9650\u5207\u308c\u3067\u3059\u3002' in resp.text:
                 raise TSRegistrationExpired('timeshift registration expired for lv' + vid)
-            if resp.text.find('\u30bf\u30a4\u30e0\u30b7\u30d5\u30c8\u306e\u4e88\u7d04\u4e0a\u9650\u306b\u9054\u3057\u307e\u3057\u305f\u3002') != -1:
+            if '\u30bf\u30a4\u30e0\u30b7\u30d5\u30c8\u306e\u4e88\u7d04\u4e0a\u9650\u306b\u9054\u3057\u307e\u3057\u305f\u3002' in resp.text:
                 raise TSReachedLimit('timeshift reservation limit has been reached')
             raise InvalidResponse('failed to register timeshift with invalid response')
         token = match.group(0)
@@ -144,9 +144,9 @@ class Niconico:
             'token': token,
         }, timeout=timeout)
         resp.raise_for_status()
-        if resp.text.find('https://account.nicovideo.jp/login') != -1:
+        if 'https://account.nicovideo.jp/login' in resp.text:
             raise LoginRequired('login is required for timeshift registration')
-        if resp.text.find('regist_finished') == -1:
+        if 'regist_finished' not in resp.text:
             raise InvalidResponse('failed to register timeshift with invalid response')
 
     @_login_if_required
