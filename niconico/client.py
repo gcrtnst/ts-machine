@@ -49,9 +49,7 @@ def _contents_search_filters_value(value):
     if isinstance(value, datetime):
         return value.isoformat(timespec='seconds')
     if isinstance(value, bool):
-        if value:
-            return 'true'
-        return 'false'
+        return 'true' if value else 'false'
     if value is None:
         return 'null'
     return str(value)
@@ -83,7 +81,7 @@ class Niconico:
         self._session.cookies = value
 
     def user_session(self):
-        for cookie in iter(self.cookies):
+        for cookie in self.cookies:
             if cookie.name == 'user_session' and cookie.domain == '.nicovideo.jp':
                 return cookie.value
         return None
