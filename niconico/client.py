@@ -97,7 +97,7 @@ class Niconico:
         return self._session.post(*args, **kwargs)
 
     def logout(self, timeout=None):
-        self._http_get('https://secure.nicovideo.jp/secure/logout', timeout=timeout)
+        self._http_get('https://secure.nicovideo.jp/secure/logout', timeout=timeout).raise_for_status()
 
     def login(self, timeout=None):
         if self.mail is None or self.password is None:
@@ -106,7 +106,7 @@ class Niconico:
         self._http_post('https://account.nicovideo.jp/api/v1/login', data={
             'mail_tel': self.mail,
             'password': self.password,
-        }, timeout=timeout)
+        }, timeout=timeout).raise_for_status()
         if self.user_session() is None:
             raise LoginFailed('mail or password is incorrect')
 
