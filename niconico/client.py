@@ -11,8 +11,8 @@ from requests import Session
 
 from . import utils
 from .exceptions import (ContentSearchError, InvalidResponse, LoginFailed,
-                         LoginRequired, TSAlreadyRegistered, TSNotSupported,
-                         TSReachedLimit, TSRegistrationExpired)
+                         LoginRequired, NotFound, TSAlreadyRegistered,
+                         TSNotSupported, TSReachedLimit, TSRegistrationExpired)
 
 
 def _login_if_required(func):
@@ -124,6 +124,8 @@ class Niconico:
         if not match:
             if resp.text.find('https://account.nicovideo.jp/login') != -1:
                 raise LoginRequired('login is required for timeshift registration')
+            if resp.text.find('\u5bfe\u8c61\u756a\u7d44\u306f\u3042\u308a\u307e\u305b\u3093\u3002') != -1 or resp.text.find('\u30b7\u30b9\u30c6\u30e0\u30a8\u30e9\u30fc') != -1:
+                raise NotFound('lv' + vid + ' not found')
             if resp.text.find('\u3053\u306e\u756a\u7d44\u306f\u30bf\u30a4\u30e0\u30b7\u30d5\u30c8\u306b\u5bfe\u5fdc\u3057\u3066\u3044\u307e\u305b\u3093\u3002') != -1:
                 raise TSNotSupported('timeshift is not supported for lv' + vid)
             if resp.text.find('http://live.nicovideo.jp/my') != -1:

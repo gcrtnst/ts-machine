@@ -18,6 +18,10 @@ class LoginRequired(NiconicoException):
     pass
 
 
+class NotFound(NiconicoException):
+    pass
+
+
 class TSNotSupported(NiconicoException):
     pass
 
