@@ -164,7 +164,7 @@ def lwp_cookiejar(*args, **kwargs):
 
 def main():
     argp = ArgumentParser()
-    argp.add_argument('config', type=Path, help='TOML-formatted configuration file')
+    argp.add_argument('-c', '--config', type=Path, default=Path('~', '.tsm').expanduser(), help='TOML-formatted configuration file (default: %(default)s)')
     argp.add_argument('-s', '--simulate', action='store_true', help='simulate timeshift reservation')
     argv = argp.parse_args()
 
