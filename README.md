@@ -10,14 +10,14 @@ ts-machine はニコニコ生放送のタイムシフト予約を自動化する
   - cron 等で定期的に実行することを意図して制作しています。
 
 ```
-usage: tsm.py [-h] [-s] config
-
-positional arguments:
-  config          TOML-formatted configuration file
+usage: tsm.py [-h] [-c CONFIG] [-s]
 
 optional arguments:
-  -h, --help      show this help message and exit
-  -s, --simulate  simulate timeshift reservation
+  -h, --help            show this help message and exit
+  -c CONFIG, --config CONFIG
+                        TOML-formatted configuration file (default:
+                        ~/.tsm)
+  -s, --simulate        simulate timeshift reservation
 ```
 
 ### 設定ファイル(TOML)
