@@ -66,6 +66,18 @@ startBefore = "2h"
 その他のエラーが発生した場合、エラーを出力して強制終了します。
 
 ## 注意点
+### niconico の利用規約について
+利用する前に以下の利用規約を読んでください。
+
+  - [niconico コンテンツ検索APIガイド](https://site.nicovideo.jp/search-api-docs/search.html)のAPI利用規約
+  - [ニコニコ生放送利用規約](https://site.live.nicovideo.jp/rule.html)
+  - [niconico規約](https://account.nicovideo.jp/rules/account)
+  - [その他の利用規約](http://info.nicovideo.jp/base/term.html)
+
+### ライセンス
+[LICENSE](LICENSE) を確認してください。
+
+### その他
   - 設定ファイル及び cookieJar のパーミッションは適切に設定してください。
   - ニコニコ生放送のサーバーに過度な負荷を掛けないようにしてください。
   - 定期実行する場合は、cookieJar を設定することをおすすめします。設定しない場合、他のブラウザソフト等でセッション切れが頻繁に起こります。
