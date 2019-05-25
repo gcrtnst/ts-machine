@@ -56,6 +56,9 @@ def _contents_search_filters_value(value):
 
 
 class Niconico:
+    _re_ts_watch_num = re.compile(re.escape(r"Nicolive.TimeshiftActions.doRegister('lv") + '(?P<vid>[0-9]+)' + re.escape("','") + r'(?P<token>ulck_[0-9]+)' + re.escape(r"')"))
+    _re_server_time = re.compile(re.escape(r'servertime=') + r'(?P<time>[0-9]+)')
+
     def __init__(self):
         self.mail = None
         self.password = None
@@ -120,9 +123,8 @@ class Niconico:
 
         tag = soup.select_one('#reserve > button')
         if tag is not None and 'onclick' in tag.attrs:
-            pattern = re.escape(r"Nicolive.TimeshiftActions.doRegister('lv") + vid + re.escape("','") + r'(?P<token>ulck_[0-9]+)' + re.escape(r"')")
-            match = re.search(pattern, tag.attrs['onclick'])
-            if match:
+            match = self._re_ts_watch_num.search(tag.attrs['onclick'])
+            if match and match.group('vid') == vid:
                 return match.group('token')
 
         tag = soup.select_one('body > div[class="ab inform"] > div.atxt > div.info > div > p')
@@ -249,8 +251,7 @@ class Niconico:
         resp = self._http_get('https://live.nicovideo.jp/api/getservertime')
         resp.raise_for_status()
 
-        pattern = re.escape(r'servertime=') + r'(?P<time>[0-9]+)'
-        match = re.search(pattern, resp.text)
+        match = self._re_server_time.search(resp.text)
         if not match:
             raise InvalidResponse('failed to get server time with invalid response')
         timestr = match.group('time')
