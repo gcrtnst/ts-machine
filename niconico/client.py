@@ -111,7 +111,7 @@ class Niconico:
             raise LoginFailed('mail or password is incorrect')
 
     @_login_if_required
-    def ts_register(self, live_id, timeout=None):
+    def ts_register(self, live_id, timeout=None, overwrite=False):
         vid = str(utils.int_id('lv', live_id))
 
         # get token
@@ -139,7 +139,7 @@ class Niconico:
 
         # register
         resp = self._http_post('https://live.nicovideo.jp/api/watchingreservation', data={
-            'mode': 'regist',
+            'mode': 'overwrite' if overwrite else 'regist',
             'vid': vid,
             'token': token,
         }, timeout=timeout)
