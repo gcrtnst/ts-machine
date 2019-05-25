@@ -120,7 +120,7 @@ class Niconico:
 
         tag = soup.select_one('#reserve > button')
         if tag is not None and 'onclick' in tag.attrs:
-            pattern = re.escape(r"Nicolive.TimeshiftActions.doRegister('lv320142236','") + r'(?P<token>ulck_\d+)' + re.escape(r"')")
+            pattern = re.escape(r"Nicolive.TimeshiftActions.doRegister('lv") + vid + re.escape("','") + r'(?P<token>ulck_\d+)' + re.escape(r"')")
             match = re.search(pattern, tag.attrs['onclick'])
             if match:
                 return match.group('token')
