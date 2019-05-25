@@ -154,6 +154,10 @@ class Niconico:
             # Time shift reserve limit reached.
             if tag.text == '\u30bf\u30a4\u30e0\u30b7\u30d5\u30c8\u306e\u4e88\u7d04\u4e0a\u9650\u306b\u9054\u3057\u307e\u3057\u305f\u3002':
                 raise TSReachedLimit('timeshift reservation limit has been reached')
+
+        tag = soup.select_one('#reserve > a > span')
+        if tag is not None and tag.text == '\u8996\u8074\u3059\u308b':  # watch
+            raise TSAlreadyRegistered('timeshift already registered for lv' + vid)
         raise InvalidResponse('failed to register timeshift with invalid response')
 
     def _ts_regist(self, vid, token, overwrite=False, timeout=None):
