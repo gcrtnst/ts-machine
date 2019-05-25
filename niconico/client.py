@@ -110,11 +110,7 @@ class Niconico:
         if self.user_session() is None:
             raise LoginFailed('mail or password is incorrect')
 
-    @_login_if_required
-    def ts_register(self, live_id, timeout=None, overwrite=False):
-        vid = str(utils.int_id('lv', live_id))
-
-        # get token
+    def _ts_watch_num(self, vid, timeout=None):
         resp = self._http_post('https://live.nicovideo.jp/api/watchingreservation', data={
             'mode': 'watch_num',
             'vid': vid,
@@ -135,9 +131,9 @@ class Niconico:
             if '\u30bf\u30a4\u30e0\u30b7\u30d5\u30c8\u306e\u4e88\u7d04\u4e0a\u9650\u306b\u9054\u3057\u307e\u3057\u305f\u3002' in resp.text:
                 raise TSReachedLimit('timeshift reservation limit has been reached')
             raise InvalidResponse('failed to register timeshift with invalid response')
-        token = match.group(0)
+        return match.group(0)
 
-        # register
+    def _ts_regist(self, vid, token, overwrite=False, timeout=None):
         resp = self._http_post('https://live.nicovideo.jp/api/watchingreservation', data={
             'mode': 'overwrite' if overwrite else 'regist',
             'vid': vid,
@@ -148,6 +144,12 @@ class Niconico:
             raise LoginRequired('login is required for timeshift registration')
         if 'regist_finished' not in resp.text:
             raise InvalidResponse('failed to register timeshift with invalid response')
+
+    @_login_if_required
+    def ts_register(self, live_id, timeout=None, overwrite=False):
+        vid = str(utils.int_id('lv', live_id))
+        token = self._ts_watch_num(vid, timeout)
+        self._ts_regist(vid, token, overwrite, timeout)
 
     @_login_if_required
     def ts_list(self, timeout=None):
