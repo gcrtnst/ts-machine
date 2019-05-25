@@ -7,6 +7,7 @@ from datetime import datetime
 
 import dateutil.parser
 import dateutil.tz
+from bs4 import BeautifulSoup
 from requests import Session
 
 from . import utils
@@ -116,22 +117,45 @@ class Niconico:
             'vid': vid,
         }, timeout=timeout)
         resp.raise_for_status()
-        match = re.search(r'ulck_\d+', resp.text)
-        if not match:
-            if 'https://account.nicovideo.jp/login' in resp.text:
+        soup = BeautifulSoup(resp.text, 'html5lib')
+
+        tag = soup.select_one('#reserve > button')
+        if tag is not None and 'onclick' in tag.attrs:
+            pattern = re.escape(r"Nicolive.TimeshiftActions.doRegister('lv320142236','") + r'(?P<token>ulck_\d+)' + re.escape(r"')")
+            match = re.search(pattern, tag.attrs['onclick'])
+            if match:
+                return match.group('token')
+
+        tag = soup.select_one('body > div[class="ab inform"] > div.atxt > div.info > div > p')
+        if tag is not None:
+            # You need to log in to use the time shift reservation.
+            if tag.text == '\u30bf\u30a4\u30e0\u30b7\u30d5\u30c8\u4e88\u7d04\u306e\u3054\u5229\u7528\u306f\u3001\u30ed\u30b0\u30a4\u30f3\u304c\u5fc5\u8981\u3067\u3059\u3002':
                 raise LoginRequired('login is required for timeshift registration')
-            if '\u5bfe\u8c61\u756a\u7d44\u306f\u3042\u308a\u307e\u305b\u3093\u3002' in resp.text or '\u30b7\u30b9\u30c6\u30e0\u30a8\u30e9\u30fc' in resp.text:
+
+            # There are no target programs.
+            if tag.text == '\u5bfe\u8c61\u756a\u7d44\u306f\u3042\u308a\u307e\u305b\u3093\u3002':
                 raise NotFound('lv' + vid + ' not found')
-            if '\u3053\u306e\u756a\u7d44\u306f\u30bf\u30a4\u30e0\u30b7\u30d5\u30c8\u306b\u5bfe\u5fdc\u3057\u3066\u3044\u307e\u305b\u3093\u3002' in resp.text:
+
+            # I'm very sorry. A system error has occurred.
+            if tag.text == '\u5927\u5909\u7533\u3057\u8a33\u3054\u3056\u3044\u307e\u305b\u3093\u3002\u30b7\u30b9\u30c6\u30e0\u30a8\u30e9\u30fc\u304c\u767a\u751f\u3057\u307e\u3057\u305f\u3002 ':
+                raise NotFound('lv' + vid + ' not found')
+
+            # This program is not time-shifted.
+            if tag.text == '\u3053\u306e\u756a\u7d44\u306f\u30bf\u30a4\u30e0\u30b7\u30d5\u30c8\u306b\u5bfe\u5fdc\u3057\u3066\u3044\u307e\u305b\u3093\u3002':
                 raise TSNotSupported('timeshift is not supported for lv' + vid)
-            if 'http://live.nicovideo.jp/my' in resp.text:
+
+            # It's already reserved.
+            if tag.text == '\u65e2\u306b\u4e88\u7d04\u6e08\u307f\u3067\u3059\u3002':
                 raise TSAlreadyRegistered('timeshift already registered for lv' + vid)
-            if '\u7533\u3057\u8fbc\u307f\u671f\u9650\u5207\u308c\u3067\u3059\u3002' in resp.text:
+
+            # The application has expired.
+            if tag.text == '\u7533\u3057\u8fbc\u307f\u671f\u9650\u5207\u308c\u3067\u3059\u3002':
                 raise TSRegistrationExpired('timeshift registration expired for lv' + vid)
-            if '\u30bf\u30a4\u30e0\u30b7\u30d5\u30c8\u306e\u4e88\u7d04\u4e0a\u9650\u306b\u9054\u3057\u307e\u3057\u305f\u3002' in resp.text:
+
+            # Time shift reserve limit reached.
+            if tag.text == '\u30bf\u30a4\u30e0\u30b7\u30d5\u30c8\u306e\u4e88\u7d04\u4e0a\u9650\u306b\u9054\u3057\u307e\u3057\u305f\u3002':
                 raise TSReachedLimit('timeshift reservation limit has been reached')
-            raise InvalidResponse('failed to register timeshift with invalid response')
-        return match.group(0)
+        raise InvalidResponse('failed to register timeshift with invalid response')
 
     def _ts_regist(self, vid, token, overwrite=False, timeout=None):
         resp = self._http_post('https://live.nicovideo.jp/api/watchingreservation', data={
@@ -140,10 +164,16 @@ class Niconico:
             'token': token,
         }, timeout=timeout)
         resp.raise_for_status()
-        if 'https://account.nicovideo.jp/login' in resp.text:
+
+        soup = BeautifulSoup(resp.text, 'html5lib')
+        if soup.select_one('#regist_finished') is not None:
+            return
+
+        # You need to log in to use the time shift reservation.
+        tag = soup.select_one('body > div[class="ab inform"] > div.atxt > div.info > div > p')
+        if tag is not None and tag.text == '\u30bf\u30a4\u30e0\u30b7\u30d5\u30c8\u4e88\u7d04\u306e\u3054\u5229\u7528\u306f\u3001\u30ed\u30b0\u30a4\u30f3\u304c\u5fc5\u8981\u3067\u3059\u3002':
             raise LoginRequired('login is required for timeshift registration')
-        if 'regist_finished' not in resp.text:
-            raise InvalidResponse('failed to register timeshift with invalid response')
+        raise InvalidResponse('failed to register timeshift with invalid response')
 
     @_login_if_required
     def ts_register(self, live_id, timeout=None, overwrite=False):
