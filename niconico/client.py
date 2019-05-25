@@ -244,6 +244,12 @@ class Niconico:
         return True
 
     def server_time(self, timeout=None):
-        resp = self._http_post('https://api.ce.nicovideo.jp/api/v1/system.unixtime', timeout=timeout)
+        resp = self._http_get('https://live.nicovideo.jp/api/getservertime')
         resp.raise_for_status()
-        return datetime.fromtimestamp(int(resp.text), tz=dateutil.tz.gettz())
+
+        pattern = re.escape(r'servertime=') + r'(?P<time>\d+)'
+        match = re.search(pattern, resp.text)
+        if not match:
+            raise InvalidResponse('failed to get server time with invalid response')
+        timestr = match.group('time')
+        return datetime.fromtimestamp(int(timestr), tz=dateutil.tz.gettz())
