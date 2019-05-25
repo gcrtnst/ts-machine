@@ -248,7 +248,7 @@ class Niconico:
         return True
 
     def server_time(self, tz=None, timeout=None):
-        resp = self._http_get('https://live.nicovideo.jp/api/getservertime')
+        resp = self._http_get('https://live.nicovideo.jp/api/getservertime', timeout=timeout)
         resp.raise_for_status()
 
         match = self._re_server_time.search(resp.text)
