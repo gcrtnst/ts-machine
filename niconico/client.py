@@ -6,7 +6,6 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 
 import dateutil.parser
-import dateutil.tz
 from bs4 import BeautifulSoup
 from requests import Session
 
@@ -243,7 +242,7 @@ class Niconico:
         resp.raise_for_status()
         return True
 
-    def server_time(self, timeout=None):
+    def server_time(self, tz=None, timeout=None):
         resp = self._http_get('https://live.nicovideo.jp/api/getservertime')
         resp.raise_for_status()
 
@@ -252,4 +251,4 @@ class Niconico:
         if not match:
             raise InvalidResponse('failed to get server time with invalid response')
         timestr = match.group('time')
-        return datetime.fromtimestamp(int(timestr), tz=dateutil.tz.gettz())
+        return datetime.fromtimestamp(int(timestr), tz=tz)

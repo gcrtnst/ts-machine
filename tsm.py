@@ -6,6 +6,7 @@ from datetime import timedelta
 from http.cookiejar import LWPCookieJar
 from pathlib import Path
 
+import dateutil.tz
 import requests.utils
 import toml
 
@@ -94,7 +95,7 @@ class TSMachine:
 
     def contents_search_filters(self, now=None):
         if now is None:
-            now = self._niconico.server_time()
+            now = self._niconico.server_time(tz=dateutil.tz.gettz())
 
         filters = {
             'timeshiftEnabled': True,
