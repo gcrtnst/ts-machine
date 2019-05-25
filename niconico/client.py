@@ -120,7 +120,7 @@ class Niconico:
 
         tag = soup.select_one('#reserve > button')
         if tag is not None and 'onclick' in tag.attrs:
-            pattern = re.escape(r"Nicolive.TimeshiftActions.doRegister('lv") + vid + re.escape("','") + r'(?P<token>ulck_\d+)' + re.escape(r"')")
+            pattern = re.escape(r"Nicolive.TimeshiftActions.doRegister('lv") + vid + re.escape("','") + r'(?P<token>ulck_[0-9]+)' + re.escape(r"')")
             match = re.search(pattern, tag.attrs['onclick'])
             if match:
                 return match.group('token')
@@ -249,7 +249,7 @@ class Niconico:
         resp = self._http_get('https://live.nicovideo.jp/api/getservertime')
         resp.raise_for_status()
 
-        pattern = re.escape(r'servertime=') + r'(?P<time>\d+)'
+        pattern = re.escape(r'servertime=') + r'(?P<time>[0-9]+)'
         match = re.search(pattern, resp.text)
         if not match:
             raise InvalidResponse('failed to get server time with invalid response')
