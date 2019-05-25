@@ -178,7 +178,7 @@ class Niconico:
         raise InvalidResponse('failed to register timeshift with invalid response')
 
     @_login_if_required
-    def ts_register(self, live_id, timeout=None, overwrite=False):
+    def ts_register(self, live_id, overwrite=False, timeout=None):
         vid = str(utils.int_id('lv', live_id))
         token = self._ts_watch_num(vid, timeout)
         self._ts_regist(vid, token, overwrite, timeout)
