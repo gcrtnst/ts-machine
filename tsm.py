@@ -41,7 +41,7 @@ class TSMachine:
         self.limit = None
         self.simulate = False
         self.stdout = sys.stdout
-        self._simulated_ts_list = None
+        self._ts_list = None
 
     @property
     def mail(self):
@@ -78,20 +78,20 @@ class TSMachine:
     def ts_list(self):
         if not self.simulate:
             return self._niconico.ts_list()
-        if self._simulated_ts_list is None:
-            self._simulated_ts_list = self._niconico.ts_list()
-        return self._simulated_ts_list[:]
+        if self._ts_list is None:
+            self._ts_list = self._niconico.ts_list()
+        return self._ts_list[:]
 
     def ts_register(self, live_id):
         if not self.simulate:
             self._niconico.ts_register(live_id)
             return
-        if self._simulated_ts_list is None:
-            self._simulated_ts_list = self._niconico.ts_list()
+        if self._ts_list is None:
+            self._ts_list = self._niconico.ts_list()
         live_id = niconico.utils.str_id('lv', live_id)
-        if live_id in self._simulated_ts_list:
+        if live_id in self._ts_list:
             raise TSAlreadyRegistered('timeshift already registered for ' + live_id)
-        self._simulated_ts_list.append(live_id)
+        self._ts_list.append(live_id)
 
     def contents_search_filters(self, now=None):
         if now is None:
