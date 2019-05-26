@@ -76,22 +76,18 @@ class TSMachine:
         self._niconico.timeout = value
 
     def ts_list(self):
-        if not self.simulate:
-            return self._niconico.ts_list()
         if self._ts_list is None:
             self._ts_list = self._niconico.ts_list()
         return self._ts_list[:]
 
     def ts_register(self, live_id):
+        live_id = niconico.utils.str_id('lv', live_id)
         if not self.simulate:
             self._niconico.ts_register(live_id)
-            return
-        if self._ts_list is None:
-            self._ts_list = self._niconico.ts_list()
-        live_id = niconico.utils.str_id('lv', live_id)
-        if live_id in self._ts_list:
+        if self.simulate and live_id in self.ts_list():
             raise TSAlreadyRegistered('timeshift already registered for ' + live_id)
-        self._ts_list.append(live_id)
+        if self._ts_list is not None:
+            self._ts_list.append(live_id)
 
     def contents_search_filters(self, now=None):
         if now is None:
