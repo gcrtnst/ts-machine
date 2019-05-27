@@ -110,9 +110,9 @@ class TSMachine:
             filters['scoreTimeshiftReserved'] = {'gte': self.filters['scoreTimeshiftReserved']}
         return filters
 
-    def iter_unreserved(self, fields={'contentId'}):
+    def iter_search(self, fields={'contentId'}):
         search_fields = {'contentId', 'title', 'channelId'} | set(fields)
-        iter_search = self._niconico.contents_search(
+        iter_contents = self._niconico.contents_search(
             self.filters['q'],
             service='live',
             targets=self.filters['targets'],
@@ -121,7 +121,7 @@ class TSMachine:
             sort=self.filters['sort'],
         )
 
-        for content in iter_search:
+        for content in iter_contents:
             if 'ppv' in self.filters:
                 is_ppv = content['channelId'] is not None and self._niconico.is_ppv_live(content['contentId'], content['channelId'])
                 if is_ppv != self.filters['ppv']:
@@ -129,11 +129,11 @@ class TSMachine:
             yield {k: v for k, v in content.items() if k in fields}
 
     def run(self):
-        iter_unreserved = self.iter_unreserved(fields={'contentId', 'title'})
+        iter_search = self.iter_search(fields={'contentId', 'title'})
         if self.limit is not None:
-            iter_unreserved = iter_takewhile(lambda: len(self.ts_list()) < self.limit, iter_unreserved)
+            iter_search = iter_takewhile(lambda: len(self.ts_list()) < self.limit, iter_search)
 
-        for content in iter_unreserved:
+        for content in iter_search:
             try:
                 self.ts_register(content['contentId'])
             except (TSAlreadyRegistered, TSRegistrationExpired):
