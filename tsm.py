@@ -39,7 +39,6 @@ class TSMachine:
 
         self.filters = {}
         self.limit = None
-        self.simulate = False
         self.stdout = sys.stdout
         self._ts_list = None
 
@@ -81,12 +80,9 @@ class TSMachine:
         return self._ts_list[:]
 
     def ts_register(self, live_id):
-        live_id = niconico.utils.str_id('lv', live_id)
-        if not self.simulate:
-            self._niconico.ts_register(live_id)
-        if self.simulate and live_id in self.ts_list():
-            raise TSAlreadyRegistered('timeshift already registered for ' + live_id)
+        self._niconico.ts_register(live_id)
         if self._ts_list is not None:
+            live_id = niconico.utils.str_id('lv', live_id)
             self._ts_list.append(live_id)
 
     def contents_search_filters(self, now=None):
@@ -162,7 +158,6 @@ def lwp_cookiejar(*args, **kwargs):
 def main():
     argp = ArgumentParser()
     argp.add_argument('-c', '--config', type=Path, default=Path('~', '.tsm').expanduser(), help='TOML-formatted configuration file (default: %(default)s)')
-    argp.add_argument('-s', '--simulate', action='store_true', help='simulate timeshift reservation')
     argv = argp.parse_args()
 
     with argv.config.open() as f:
@@ -182,7 +177,6 @@ def main():
         tsm.timeout = config['misc']['timeout']
         tsm.filters = config['search']
         tsm.limit = config['misc']['limit']
-        tsm.simulate = argv.simulate
         tsm.run()
 
 
