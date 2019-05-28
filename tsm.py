@@ -40,7 +40,6 @@ class TSMachine:
         self.filters = {}
         self.limit = None
         self.stdout = sys.stdout
-        self._ts_list = None
 
     @property
     def mail(self):
@@ -73,17 +72,6 @@ class TSMachine:
     @timeout.setter
     def timeout(self, value):
         self._niconico.timeout = value
-
-    def ts_list(self):
-        if self._ts_list is None:
-            self._ts_list = self._niconico.ts_list()
-        return self._ts_list[:]
-
-    def ts_register(self, live_id):
-        self._niconico.ts_register(live_id)
-        if self._ts_list is not None:
-            live_id = niconico.utils.str_id('lv', live_id)
-            self._ts_list.append(live_id)
 
     def contents_search_filters(self, now=None):
         if now is None:
@@ -131,11 +119,11 @@ class TSMachine:
     def auto_reserve(self):
         iter_search = self.iter_search(fields={'contentId', 'title'})
         if self.limit is not None:
-            iter_search = iter_takewhile(lambda: len(self.ts_list()) < self.limit, iter_search)
+            iter_search = iter_takewhile(lambda: len(self._niconico.ts_list()) < self.limit, iter_search)
 
         for content in iter_search:
             try:
-                self.ts_register(content['contentId'])
+                self._niconico.ts_register(content['contentId'])
             except (TSAlreadyRegistered, TSRegistrationExpired):
                 continue
             print('reserved: ' + content['contentId'] + ': ' + content['title'], file=self.stdout)
