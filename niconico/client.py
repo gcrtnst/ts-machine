@@ -99,25 +99,25 @@ class Niconico:
             kwargs['timeout'] = self.timeout
         return self._session.post(*args, **kwargs)
 
-    def logout(self, timeout=None):
-        self._http_get('https://secure.nicovideo.jp/secure/logout', timeout=timeout, allow_redirects=False).raise_for_status()
+    def logout(self):
+        self._http_get('https://secure.nicovideo.jp/secure/logout', allow_redirects=False).raise_for_status()
 
-    def login(self, timeout=None):
+    def login(self):
         if self.mail is None or self.password is None:
             raise LoginFailed('mail or password not provided')
 
         self._http_post('https://account.nicovideo.jp/api/v1/login', data={
             'mail_tel': self.mail,
             'password': self.password,
-        }, timeout=timeout, allow_redirects=False).raise_for_status()
+        }, allow_redirects=False).raise_for_status()
         if self.user_session() is None:
             raise LoginFailed('mail or password is incorrect')
 
-    def _ts_watch_num(self, vid, timeout=None):
+    def _ts_watch_num(self, vid):
         resp = self._http_post('https://live.nicovideo.jp/api/watchingreservation', data={
             'mode': 'watch_num',
             'vid': vid,
-        }, timeout=timeout)
+        })
         resp.raise_for_status()
         soup = BeautifulSoup(resp.text, 'html5lib')
 
@@ -162,12 +162,12 @@ class Niconico:
             raise TSAlreadyRegistered('timeshift already registered for lv' + vid)
         raise InvalidResponse('failed to register timeshift for lv' + vid + ' with invalid response')
 
-    def _ts_regist(self, vid, token, overwrite=False, timeout=None):
+    def _ts_regist(self, vid, token, overwrite=False):
         resp = self._http_post('https://live.nicovideo.jp/api/watchingreservation', data={
             'mode': 'overwrite' if overwrite else 'regist',
             'vid': vid,
             'token': token,
-        }, timeout=timeout)
+        })
         resp.raise_for_status()
 
         soup = BeautifulSoup(resp.text, 'html5lib')
@@ -180,16 +180,16 @@ class Niconico:
         raise InvalidResponse('failed to register timeshift for lv' + vid + ' with invalid response')
 
     @_login_if_required
-    def ts_register(self, live_id, overwrite=False, timeout=None):
+    def ts_register(self, live_id, overwrite=False):
         vid = str(utils.int_id('lv', live_id))
-        token = self._ts_watch_num(vid, timeout)
-        self._ts_regist(vid, token, overwrite, timeout)
+        token = self._ts_watch_num(vid)
+        self._ts_regist(vid, token, overwrite)
 
     @_login_if_required
-    def ts_list(self, timeout=None):
+    def ts_list(self):
         resp = self._http_post('https://live.nicovideo.jp/api/watchingreservation', data={
             'mode': 'list',
-        }, timeout=timeout)
+        })
         root = ET.fromstring(resp.text)
         if 'status' not in root.attrib:
             raise InvalidResponse('failed to get timeshift list with invalid response')
@@ -199,7 +199,7 @@ class Niconico:
             raise InvalidResponse('failed to get timeshift list with unknown status ' + root.attrib['status'])
         return ['lv' + vid.text for vid in root.iterfind('./timeshift_reserved_list/vid')]
 
-    def contents_search(self, q, service='video', targets=['title', 'description', 'tags'], fields=set(), filters={}, json_filter=None, sort='-viewCounter', timeout=None):
+    def contents_search(self, q, service='video', targets=['title', 'description', 'tags'], fields=set(), filters={}, json_filter=None, sort='-viewCounter'):
         service = urllib.parse.quote(service, safe='')
         data = {
             'q': q,
@@ -218,7 +218,7 @@ class Niconico:
 
         total = 1600
         while data['_offset'] < total:
-            resp = self._http_post('https://api.search.nicovideo.jp/api/v2/' + service + '/contents/search', data=data, timeout=timeout)
+            resp = self._http_post('https://api.search.nicovideo.jp/api/v2/' + service + '/contents/search', data=data)
             resp_json = json.loads(resp.text)
             if 'meta' not in resp_json:
                 raise InvalidResponse('contents search failed with invalid response')
@@ -238,17 +238,17 @@ class Niconico:
             if resp_json['meta']['totalCount'] < total:
                 total = resp_json['meta']['totalCount']
 
-    def is_ppv_live(self, live_id, channel_id, timeout=None):
+    def is_ppv_live(self, live_id, channel_id):
         live_id = utils.str_id('lv', live_id)
         channel_id = utils.str_id('ch', channel_id)
-        resp = self._http_get('https://ch.nicovideo.jp/ppv_live/' + channel_id + '/' + live_id, timeout=timeout)
+        resp = self._http_get('https://ch.nicovideo.jp/ppv_live/' + channel_id + '/' + live_id)
         if resp.status_code == 404:
             return False
         resp.raise_for_status()
         return True
 
-    def server_time(self, tz=None, timeout=None):
-        resp = self._http_get('https://live.nicovideo.jp/api/getservertime', timeout=timeout)
+    def server_time(self, tz=None):
+        resp = self._http_get('https://live.nicovideo.jp/api/getservertime')
         resp.raise_for_status()
 
         match = self._re_server_time.search(resp.text)
