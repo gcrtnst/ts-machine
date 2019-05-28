@@ -91,8 +91,8 @@ class TSMachine:
             filters['scoreTimeshiftReserved'] = {'gte': self.filters['scoreTimeshiftReserved']}
         return filters
 
-    def iter_search(self, fields={'contentId'}):
-        search_fields = {'contentId', 'title', 'channelId'} | set(fields)
+    def iter_search(self, fields=set()):
+        search_fields = {'contentId', 'channelId'} | set(fields)
         iter_contents = self._niconico.contents_search(
             self.filters['q'],
             service='live',
@@ -123,7 +123,7 @@ class TSMachine:
 
     def run_auto_reserve(self):
         ts_list_before = self._niconico.ts_list()
-        for content in self.iter_search(fields={'contentId', 'title'}):
+        for content in self.iter_search(fields={'contentId'}):
             if content['contentId'] in (ts['vid'] for ts in ts_list_before):
                 continue
             try:
