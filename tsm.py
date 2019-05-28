@@ -134,6 +134,7 @@ class TSMachine:
                 print('warning: timeshift registration expired for ' + content['contentId'], file=self.stderr)
                 continue
             except TSReachedLimit:
+                print('warning: reached limit', file=self.stderr)
                 break
 
         ts_list_after = self._niconico.ts_list()
