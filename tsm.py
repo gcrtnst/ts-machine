@@ -1,4 +1,5 @@
 import contextlib
+import itertools
 import re
 import sys
 from argparse import ArgumentParser
@@ -114,6 +115,12 @@ class TSMachine:
                 continue
             print('+++ ' + ts['vid'] + ': ' + ts['title'], file=self.stdout)
 
+    def run_search_only(self, n):
+        iter_search = self.iter_search(fields={'contentId', 'title'})
+        iter_search = itertools.islice(iter_search, n)
+        for content in iter_search:
+            print(content['contentId'] + ': ' + content['title'], file=self.stdout)
+
     def run_auto_reserve(self):
         ts_list_before = self._niconico.ts_list()
         for content in self.iter_search(fields={'contentId', 'title'}):
@@ -148,6 +155,7 @@ def lwp_cookiejar(*args, **kwargs):
 def main():
     argp = ArgumentParser()
     argp.add_argument('-c', '--config', type=Path, default=Path('~', '.tsm').expanduser(), help='TOML-formatted configuration file (default: %(default)s)')
+    argp.add_argument('-s', '--search', type=int, nargs='?', const=10, metavar='N', help='search only mode; N specifies maximum number of programs to search (default: %(const)s)')
     argv = argp.parse_args()
 
     with argv.config.open() as f:
@@ -165,7 +173,10 @@ def main():
         tsm.cookies = jar
         tsm.timeout = config['misc']['timeout']
         tsm.filters = config['search']
-        tsm.run_auto_reserve()
+        if argv.search is not None:
+            tsm.run_search_only(argv.search)
+        else:
+            tsm.run_auto_reserve()
 
 
 if __name__ == '__main__':
