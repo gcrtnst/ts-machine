@@ -10,7 +10,8 @@ import dateutil.tz
 import requests.utils
 import toml
 
-from niconico import Niconico, TSAlreadyRegistered, TSRegistrationExpired
+from niconico import (Niconico, TSAlreadyRegistered, TSReachedLimit,
+                      TSRegistrationExpired)
 
 
 def parse_timedelta(s):
@@ -116,6 +117,8 @@ class TSMachine:
             except TSRegistrationExpired:
                 print('warning: timeshift registration expired for ' + content['contentId'], file=self.stderr)
                 continue
+            except TSReachedLimit:
+                break
             print('reserved: ' + content['contentId'] + ': ' + content['title'], file=self.stdout)
 
 
