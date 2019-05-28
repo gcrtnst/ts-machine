@@ -128,7 +128,7 @@ class TSMachine:
                     continue
             yield {k: v for k, v in content.items() if k in fields}
 
-    def run(self):
+    def auto_reserve(self):
         iter_search = self.iter_search(fields={'contentId', 'title'})
         if self.limit is not None:
             iter_search = iter_takewhile(lambda: len(self.ts_list()) < self.limit, iter_search)
@@ -175,7 +175,7 @@ def main():
         tsm.timeout = config['misc']['timeout']
         tsm.filters = config['search']
         tsm.limit = config['misc']['limit']
-        tsm.run()
+        tsm.auto_reserve()
 
 
 if __name__ == '__main__':
