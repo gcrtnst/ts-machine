@@ -26,7 +26,6 @@ def parse_timedelta(s):
 class TSMachine:
     def __init__(self):
         self._niconico = Niconico()
-        self._niconico.context = self._niconico.user_agent
         self._niconico.tz = dateutil.tz.gettz()
 
         self.filters = {}
@@ -73,6 +72,14 @@ class TSMachine:
     @user_agent.setter
     def user_agent(self, value):
         self._niconico.user_agent = value
+
+    @property
+    def context(self):
+        return self._niconico.context
+
+    @context.setter
+    def context(self, value):
+        self._niconico.context = value
 
     def ts_register(self, live_id):
         self._niconico.ts_register(live_id, overwrite=self.overwrite)
@@ -179,6 +186,7 @@ def main():
     config['misc']['overwrite'] = config['misc'].get('overwrite', False)
     config['misc']['timeout'] = config['misc'].get('timeout', 300)
     config['misc']['userAgent'] = config['misc'].get('userAgent', requests.utils.default_user_agent() + ' ts-machine (private app)')
+    config['misc']['context'] = config['misc'].get('context', config['misc']['userAgent'])
 
     with lwp_cookiejar(filename=config['login'].get('cookieJar')) as jar:
         tsm = TSMachine()
@@ -187,6 +195,7 @@ def main():
         tsm.cookies = jar
         tsm.timeout = config['misc']['timeout']
         tsm.user_agent = config['misc']['userAgent']
+        tsm.context = config['misc']['context']
         tsm.filters = config['search']
         tsm.overwrite = config['misc']['overwrite']
         if argv.search is not None:
