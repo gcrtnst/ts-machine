@@ -186,9 +186,9 @@ class Niconico:
         self._ts_regist(vid, token, overwrite)
 
     @_login_if_required
-    def ts_list(self):
+    def ts_list(self, tz=None):
         resp = self._http_post('https://live.nicovideo.jp/api/watchingreservation', data={
-            'mode': 'list',
+            'mode': 'detaillist',
         })
         root = ET.fromstring(resp.text)
         if 'status' not in root.attrib:
@@ -197,7 +197,18 @@ class Niconico:
             raise LoginRequired('login is required to get timeshift list')
         if root.attrib['status'] != 'ok':
             raise InvalidResponse('failed to get timeshift list with unknown status ' + root.attrib['status'])
-        return ['lv' + vid.text for vid in root.iterfind('./timeshift_reserved_list/vid')]
+
+        items = []
+        for xml_item in root.iterfind('./timeshift_reserved_detail_list/reserved_item'):
+            expire = int(xml_item.find('expire').text)
+            items.append({
+                'vid': 'lv' + xml_item.find('vid').text,
+                'title': xml_item.find('title').text,
+                'status': xml_item.find('status').text,
+                'unwatch': xml_item.find('unwatch').text != '0',
+                'expire': datetime.fromtimestamp(expire, tz=tz) if expire != 0 else None,
+            })
+        return items
 
     def contents_search(self, q, service='video', targets=['title', 'description', 'tags'], fields=set(), filters={}, json_filter=None, sort='-viewCounter'):
         service = urllib.parse.quote(service, safe='')
