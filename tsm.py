@@ -107,9 +107,7 @@ class TSMachine:
             yield {k: v for k, v in content.items() if k in fields}
 
     def auto_reserve(self):
-        iter_search = self.iter_search(fields={'contentId', 'title'})
-
-        for content in iter_search:
+        for content in self.iter_search(fields={'contentId', 'title'}):
             try:
                 self._niconico.ts_register(content['contentId'])
             except TSAlreadyRegistered:
