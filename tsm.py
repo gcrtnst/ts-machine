@@ -108,7 +108,14 @@ class TSMachine:
                     continue
             yield {k: v for k, v in content.items() if k in fields}
 
+    def print_diff(self, ts_list_before, ts_list_after):
+        for ts in ts_list_after:
+            if ts['vid'] in (ts['vid'] for ts in ts_list_before):
+                continue
+            print('+++ ' + ts['vid'] + ': ' + ts['title'])
+
     def auto_reserve(self):
+        ts_list_before = self._niconico.ts_list()
         for content in self.iter_search(fields={'contentId', 'title'}):
             try:
                 self._niconico.ts_register(content['contentId'])
@@ -119,7 +126,9 @@ class TSMachine:
                 continue
             except TSReachedLimit:
                 break
-            print('+++ ' + content['contentId'] + ': ' + content['title'], file=self.stdout)
+
+        ts_list_after = self._niconico.ts_list()
+        self.print_diff(ts_list_before, ts_list_after)
 
 
 @contextlib.contextmanager
