@@ -112,7 +112,7 @@ class TSMachine:
         for ts in ts_list_after:
             if ts['vid'] in (ts['vid'] for ts in ts_list_before):
                 continue
-            print('+++ ' + ts['vid'] + ': ' + ts['title'])
+            print('+++ ' + ts['vid'] + ': ' + ts['title'], file=self.stdout)
 
     def run_auto_reserve(self):
         ts_list_before = self._niconico.ts_list()
