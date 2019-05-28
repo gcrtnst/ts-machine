@@ -10,7 +10,6 @@ import dateutil.tz
 import requests.utils
 import toml
 
-import niconico.utils
 from niconico import Niconico, TSAlreadyRegistered, TSRegistrationExpired
 
 
