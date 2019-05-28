@@ -31,6 +31,7 @@ class TSMachine:
         self._niconico.tz = dateutil.tz.gettz()
 
         self.filters = {}
+        self.overwrite = False
         self.stdout = sys.stdout
         self.stderr = sys.stderr
 
@@ -65,6 +66,9 @@ class TSMachine:
     @timeout.setter
     def timeout(self, value):
         self._niconico.timeout = value
+
+    def ts_register(self, live_id):
+        self._niconico.ts_register(live_id, overwrite=self.overwrite)
 
     def contents_search_filters(self, now=None):
         if now is None:
@@ -127,7 +131,7 @@ class TSMachine:
             if content['contentId'] in (ts['vid'] for ts in ts_list_before):
                 continue
             try:
-                self._niconico.ts_register(content['contentId'])
+                self.ts_register(content['contentId'])
             except TSAlreadyRegistered:
                 continue
             except TSRegistrationExpired:
@@ -165,6 +169,7 @@ def main():
     config['search']['sort'] = config['search'].get('sort', '+startTime')
     config['search']['startAfter'] = config['search'].get('startAfter', '30m')
     config['misc'] = config.get('misc', {})
+    config['misc']['overwrite'] = config['misc'].get('overwrite', False)
     config['misc']['timeout'] = config['misc'].get('timeout', 300)
 
     with lwp_cookiejar(filename=config['login'].get('cookieJar')) as jar:
@@ -174,6 +179,7 @@ def main():
         tsm.cookies = jar
         tsm.timeout = config['misc']['timeout']
         tsm.filters = config['search']
+        tsm.overwrite = config['misc']['overwrite']
         if argv.search is not None:
             tsm.run_search_only(argv.search)
         else:
