@@ -81,6 +81,14 @@ class TSMachine:
     def context(self, value):
         self._niconico.context = value
 
+    @property
+    def tz(self):
+        return self._niconico.tz
+
+    @tz.setter
+    def tz(self, value):
+        self._niconico.tz = value
+
     def ts_register(self, live_id):
         self._niconico.ts_register(live_id, overwrite=self.overwrite)
 
