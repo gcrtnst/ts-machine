@@ -141,6 +141,11 @@ class TSMachine:
                 continue
             print('+++ ' + ts['vid'] + ': ' + ts['title'], file=self.stdout)
 
+        for ts in ts_list_before:
+            if ts['vid'] in (ts['vid'] for ts in ts_list_after):
+                continue
+            print('--- ' + ts['vid'] + ': ' + ts['title'], file=self.stdout)
+
     def run_search_only(self, n):
         iter_search = self.iter_search(fields={'contentId', 'title'})
         iter_search = itertools.islice(iter_search, n)
