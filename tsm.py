@@ -117,6 +117,8 @@ class TSMachine:
     def auto_reserve(self):
         ts_list_before = self._niconico.ts_list()
         for content in self.iter_search(fields={'contentId', 'title'}):
+            if content['contentId'] in (ts['vid'] for ts in ts_list_before):
+                continue
             try:
                 self._niconico.ts_register(content['contentId'])
             except TSAlreadyRegistered:
