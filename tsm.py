@@ -119,7 +119,7 @@ class TSMachine:
                 continue
             except TSReachedLimit:
                 break
-            print('reserved: ' + content['contentId'] + ': ' + content['title'], file=self.stdout)
+            print('+++ ' + content['contentId'] + ': ' + content['title'], file=self.stdout)
 
 
 @contextlib.contextmanager
