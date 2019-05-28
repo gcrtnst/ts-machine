@@ -154,9 +154,9 @@ class Niconico:
             if tag.text == '\u7533\u3057\u8fbc\u307f\u671f\u9650\u5207\u308c\u3067\u3059\u3002':
                 raise TSRegistrationExpired('timeshift registration expired for lv' + vid)
 
-            # Time shift reserve limit reached.
-            if tag.text == '\u30bf\u30a4\u30e0\u30b7\u30d5\u30c8\u306e\u4e88\u7d04\u4e0a\u9650\u306b\u9054\u3057\u307e\u3057\u305f\u3002':
-                raise TSReachedLimit('timeshift reservation limit has been reached')
+        tag = soup.select_one('body > div[class="ab inform"] > div.atxt > div.info > p')
+        if tag is not None and tag.text == '\u30bf\u30a4\u30e0\u30b7\u30d5\u30c8\u306e\u4e88\u7d04\u4e0a\u9650\u306b\u9054\u3057\u307e\u3057\u305f\u3002':  # Time shift reserve limit reached.
+            raise TSReachedLimit('timeshift reservation limit has been reached')
 
         tag = soup.select_one('#reserve > a > span')
         if tag is not None and tag.text == '\u8996\u8074\u3059\u308b':  # watch
