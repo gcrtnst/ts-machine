@@ -29,6 +29,7 @@ class TSMachine:
 
         self.filters = {}
         self.stdout = sys.stdout
+        self.stderr = sys.stderr
 
     @property
     def mail(self):
@@ -111,8 +112,10 @@ class TSMachine:
         for content in iter_search:
             try:
                 self._niconico.ts_register(content['contentId'])
-            except (TSAlreadyRegistered, TSRegistrationExpired):
+            except TSAlreadyRegistered:
                 continue
+            except TSRegistrationExpired:
+                print('warning: timeshift registration expired for ' + content['contentId'])
             print('reserved: ' + content['contentId'] + ': ' + content['title'], file=self.stdout)
 
 
