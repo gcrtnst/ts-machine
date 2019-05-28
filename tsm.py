@@ -115,6 +115,7 @@ class TSMachine:
                 continue
             except TSRegistrationExpired:
                 print('warning: timeshift registration expired for ' + content['contentId'], file=self.stderr)
+                continue
             print('reserved: ' + content['contentId'] + ': ' + content['title'], file=self.stdout)
 
 
