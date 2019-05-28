@@ -10,13 +10,15 @@ ts-machine はニコニコ生放送のタイムシフト予約を自動化する
   - cron 等で定期的に実行することを意図して制作しています。
 
 ```
-usage: tsm.py [-h] [-c CONFIG]
+usage: tsm.py [-h] [-c CONFIG] [-s [N]]
 
 optional arguments:
   -h, --help            show this help message and exit
   -c CONFIG, --config CONFIG
                         TOML-formatted configuration file (default:
                         ~/.tsm)
+  -s [N], --search [N]  search only mode; N specifies maximum number of
+                        programs to search (default: 10)
 ```
 
 ### 設定ファイル(TOML)
@@ -40,7 +42,10 @@ optional arguments:
 ||scoreTimeshiftReserved|integer|yes||タイムシフト予約者数の下限|
 ||memberOnly|bool|yes||チャンネル・コミュニティ限定か|
 ||ppv|bool|yes||有料放送か(ネットチケットが必要か)|
-|misc|timeout|integer or float|yes|`300`|サーバーのレスポンスが受信できなくなってから指定秒数経過すると処理を中断します。|
+|misc|overwrite|bool|yes|`false`|視聴期限が切れたタイムシフト予約を上書きします。|
+||timeout|integer or float|yes|`300`|サーバーのレスポンスが受信できなくなってから指定秒数経過すると処理を中断します。|
+||userAgent|string|yes|`ts-machine (private app)`|HTTP リクエストの User-Agent ヘッダ。|
+||context|string|yes|userAgent を継承|[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)の \_context クエリパラメータ。|
 
 #### 設定例
 今から2時間以内に放送開始される、公式の将棋番組をタイムシフト予約する場合の設定。
@@ -56,15 +61,8 @@ providerType = "official"
 startBefore = "2h"
 ```
 
-### エラー時の動作
-以下のエラーが発生した場合、何もエラーを出力せずに次の番組の予約に移ります。
-  - 予約しようとした番組が既に予約済みだった
-  - タイムシフト予約が申し込み期限切れだった
-
-その他のエラーが発生した場合、エラーを出力して強制終了します。
-
 ## 注意点
-### niconico の利用規約について
+### niconico の利用規約
 利用する前に以下の利用規約を読んでください。
 
   - [niconico コンテンツ検索APIガイド](https://site.nicovideo.jp/search-api-docs/search.html)のAPI利用規約
