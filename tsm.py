@@ -21,15 +21,6 @@ def parse_timedelta(s):
     return timedelta(**kwargs)
 
 
-def iter_takewhile(func, p):
-    p = p.__iter__()
-    while func():
-        try:
-            yield p.__next__()
-        except StopIteration:
-            return
-
-
 class TSMachine:
     def __init__(self):
         self._niconico = Niconico()
@@ -37,7 +28,6 @@ class TSMachine:
         self._niconico.context = self._niconico.user_agent
 
         self.filters = {}
-        self.limit = None
         self.stdout = sys.stdout
 
     @property
@@ -117,8 +107,6 @@ class TSMachine:
 
     def auto_reserve(self):
         iter_search = self.iter_search(fields={'contentId', 'title'})
-        if self.limit is not None:
-            iter_search = iter_takewhile(lambda: len(self._niconico.ts_list()) < self.limit, iter_search)
 
         for content in iter_search:
             try:
@@ -151,7 +139,6 @@ def main():
     config['search']['sort'] = config['search'].get('sort', '+startTime')
     config['search']['startAfter'] = config['search'].get('startAfter', '30m')
     config['misc'] = config.get('misc', {})
-    config['misc']['limit'] = config['misc'].get('limit', 10)
     config['misc']['timeout'] = config['misc'].get('timeout', 300)
 
     with lwp_cookiejar(filename=config['login'].get('cookieJar')) as jar:
@@ -161,7 +148,6 @@ def main():
         tsm.cookies = jar
         tsm.timeout = config['misc']['timeout']
         tsm.filters = config['search']
-        tsm.limit = config['misc']['limit']
         tsm.auto_reserve()
 
 
