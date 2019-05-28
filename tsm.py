@@ -114,7 +114,7 @@ class TSMachine:
                 continue
             print('+++ ' + ts['vid'] + ': ' + ts['title'])
 
-    def auto_reserve(self):
+    def run_auto_reserve(self):
         ts_list_before = self._niconico.ts_list()
         for content in self.iter_search(fields={'contentId', 'title'}):
             if content['contentId'] in (ts['vid'] for ts in ts_list_before):
@@ -165,7 +165,7 @@ def main():
         tsm.cookies = jar
         tsm.timeout = config['misc']['timeout']
         tsm.filters = config['search']
-        tsm.auto_reserve()
+        tsm.run_auto_reserve()
 
 
 if __name__ == '__main__':
