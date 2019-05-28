@@ -135,22 +135,30 @@ class TSMachine:
                     continue
             yield {k: v for k, v in content.items() if k in fields}
 
+    def print(self, *args, **kwargs):
+        kwargs['file'] = kwargs.get('file', self.stdout)
+        print(*args, **kwargs)
+
+    def print_err(self, *args, **kwargs):
+        kwargs['file'] = kwargs.get('file', self.stderr)
+        print(*args, **kwargs)
+
     def print_diff(self, ts_list_before, ts_list_after):
         for ts in ts_list_after:
             if ts['vid'] in (ts['vid'] for ts in ts_list_before):
                 continue
-            print('+++ ' + ts['vid'] + ': ' + ts['title'], file=self.stdout)
+            self.print('+++ ' + ts['vid'] + ': ' + ts['title'])
 
         for ts in ts_list_before:
             if ts['vid'] in (ts['vid'] for ts in ts_list_after):
                 continue
-            print('--- ' + ts['vid'] + ': ' + ts['title'], file=self.stdout)
+            self.print('--- ' + ts['vid'] + ': ' + ts['title'])
 
     def run_search_only(self, n):
         iter_search = self.iter_search(fields={'contentId', 'title'})
         iter_search = itertools.islice(iter_search, n)
         for content in iter_search:
-            print(content['contentId'] + ': ' + content['title'], file=self.stdout)
+            self.print(content['contentId'] + ': ' + content['title'])
 
     def run_auto_reserve(self):
         ts_list_before = self._niconico.ts_list()
@@ -162,10 +170,10 @@ class TSMachine:
             except TSAlreadyRegistered:
                 continue
             except TSRegistrationExpired:
-                print('warning: timeshift registration expired for ' + content['contentId'], file=self.stderr)
+                self.print_err('warning: timeshift registration expired for ' + content['contentId'])
                 continue
             except TSReachedLimit:
-                print('warning: reached limit', file=self.stderr)
+                self.print_err('warning: reached limit')
                 break
 
         ts_list_after = self._niconico.ts_list()
