@@ -45,7 +45,7 @@ optional arguments:
 |misc|overwrite|bool|yes|`false`|視聴期限が切れたタイムシフト予約を上書きします。|
 ||timeout|integer or float|yes|`300`|サーバーのレスポンスが受信できなくなってから指定秒数経過すると処理を中断します。|
 ||userAgent|string|yes|`ts-machine (private app)`|HTTP リクエストの User-Agent ヘッダ。|
-||context|string|yes|userAgent を継承|[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)の \_context クエリパラメータ。|
+||context|string|yes|userAgent と同じ値になる|[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)の \_context クエリパラメータ。|
 
 #### 設定例
 今から2時間以内に放送開始される、公式の将棋番組をタイムシフト予約する場合の設定。
