@@ -64,6 +64,7 @@ class Niconico:
         self.password = None
         self.context = None
         self.timeout = None
+        self.tz = None
         self._session = Session()
         self._session.headers = {}
 
@@ -186,7 +187,7 @@ class Niconico:
         self._ts_regist(vid, token, overwrite)
 
     @_login_if_required
-    def ts_list(self, tz=None):
+    def ts_list(self):
         resp = self._http_post('https://live.nicovideo.jp/api/watchingreservation', data={
             'mode': 'detaillist',
         })
@@ -206,7 +207,7 @@ class Niconico:
                 'title': xml_item.find('title').text,
                 'status': xml_item.find('status').text,
                 'unwatch': xml_item.find('unwatch').text != '0',
-                'expire': datetime.fromtimestamp(expire, tz=tz) if expire != 0 else None,
+                'expire': datetime.fromtimestamp(expire, tz=self.tz) if expire != 0 else None,
             })
         return items
 
@@ -258,7 +259,7 @@ class Niconico:
         resp.raise_for_status()
         return True
 
-    def server_time(self, tz=None):
+    def server_time(self):
         resp = self._http_get('https://live.nicovideo.jp/api/getservertime')
         resp.raise_for_status()
 
@@ -266,4 +267,4 @@ class Niconico:
         if not match:
             raise InvalidResponse('failed to get server time with invalid response')
         timestr = match.group('time')
-        return datetime.fromtimestamp(int(timestr), tz=tz)
+        return datetime.fromtimestamp(int(timestr), tz=self.tz)

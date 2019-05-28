@@ -26,6 +26,7 @@ class TSMachine:
         self._niconico = Niconico()
         self._niconico.user_agent = requests.utils.default_user_agent() + ' ts-machine (private app)'
         self._niconico.context = self._niconico.user_agent
+        self._niconico.tz = dateutil.tz.gettz()
 
         self.filters = {}
         self.stdout = sys.stdout
@@ -65,7 +66,7 @@ class TSMachine:
 
     def contents_search_filters(self, now=None):
         if now is None:
-            now = self._niconico.server_time(tz=dateutil.tz.gettz())
+            now = self._niconico.server_time()
 
         filters = {
             'timeshiftEnabled': True,
