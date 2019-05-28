@@ -178,6 +178,8 @@ class Niconico:
         tag = soup.select_one('body > div[class="ab inform"] > div.atxt > div.info > div > p')
         if tag is not None and tag.text == '\u30bf\u30a4\u30e0\u30b7\u30d5\u30c8\u4e88\u7d04\u306e\u3054\u5229\u7528\u306f\u3001\u30ed\u30b0\u30a4\u30f3\u304c\u5fc5\u8981\u3067\u3059\u3002':  # You need to log in to use the time shift reservation.
             raise LoginRequired('login is required for timeshift registration')
+        if soup.select_one('#overwrite') is not None:
+            raise TSReachedLimit('timeshift reservation limit has been reached')
         raise InvalidResponse('failed to register timeshift for lv' + vid + ' with invalid response')
 
     @_login_if_required
