@@ -8,7 +8,6 @@ from http.cookiejar import LWPCookieJar
 from pathlib import Path
 
 import dateutil.tz
-import requests.utils
 import toml
 
 from niconico import (Niconico, TSAlreadyRegistered, TSReachedLimit,
@@ -206,7 +205,7 @@ def main():
     config['misc'] = config.get('misc', {})
     config['misc']['overwrite'] = config['misc'].get('overwrite', False)
     config['misc']['timeout'] = config['misc'].get('timeout', 300)
-    config['misc']['userAgent'] = config['misc'].get('userAgent', requests.utils.default_user_agent() + ' ts-machine (private app)')
+    config['misc']['userAgent'] = config['misc'].get('userAgent', 'ts-machine (private app)')
     config['misc']['context'] = config['misc'].get('context', config['misc']['userAgent'])
 
     with lwp_cookiejar(filename=config['login'].get('cookieJar')) as jar:
