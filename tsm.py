@@ -147,12 +147,12 @@ class TSMachine:
         for ts in ts_list_after:
             if ts['vid'] in (ts['vid'] for ts in ts_list_before):
                 continue
-            self.print('+++ ' + ts['vid'] + ': ' + ts['title'])
+            self.print('added:   ' + ts['vid'] + ': ' + ts['title'])
 
         for ts in ts_list_before:
             if ts['vid'] in (ts['vid'] for ts in ts_list_after):
                 continue
-            self.print('--- ' + ts['vid'] + ': ' + ts['title'])
+            self.print('removed: ' + ts['vid'] + ': ' + ts['title'])
 
     def run_search_only(self, n):
         iter_search = self.iter_search(fields={'contentId', 'title'})
