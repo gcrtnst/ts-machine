@@ -10,8 +10,7 @@ def parse_id(content_id):
         match = re.search(r'^(?P<prefix>[a-z]+)?(?P<id>[0-9]+)$', content_id)
         if match:
             groupdict = match.groupdict()
-            if groupdict['id']:
-                return (groupdict['prefix'], int(groupdict['id']))
+            return (groupdict['prefix'], int(groupdict['id']))
     raise InvalidContentID('invalid context id: {}'.format(content_id))
 
 
