@@ -116,6 +116,12 @@ class TSMachine:
             filters['scoreTimeshiftReserved'] = {'gte': self.filters['scoreTimeshiftReserved']}
         return filters
 
+    def match_ppv(self, live_id, channel_id):
+        if 'ppv' not in self.filters:
+            return True
+        is_ppv = channel_id is not None and self._niconico.is_ppv_live(live_id, channel_id)
+        return is_ppv == self.filters['ppv']
+
     def iter_search(self, fields=set()):
         search_fields = {'contentId', 'channelId'} | set(fields)
         iter_contents = self._niconico.contents_search(
@@ -128,10 +134,8 @@ class TSMachine:
         )
 
         for content in iter_contents:
-            if 'ppv' in self.filters:
-                is_ppv = content['channelId'] is not None and self._niconico.is_ppv_live(content['contentId'], content['channelId'])
-                if is_ppv != self.filters['ppv']:
-                    continue
+            if not self.match_ppv(content['contentId'], content['channelId']):
+                continue
             yield {k: v for k, v in content.items() if k in fields}
 
     def print(self, *args, **kwargs):
