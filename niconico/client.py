@@ -84,12 +84,6 @@ class Niconico:
     def cookies(self, value):
         self._session.cookies = value
 
-    def user_session(self):
-        for cookie in self.cookies:
-            if cookie.name == 'user_session' and cookie.domain == '.nicovideo.jp':
-                return cookie.value
-        return None
-
     def _http_get(self, *args, **kwargs):
         if 'timeout' not in kwargs or kwargs['timeout'] is None:
             kwargs['timeout'] = self.timeout
@@ -107,12 +101,15 @@ class Niconico:
         if self.mail is None or self.password is None:
             raise LoginFailed('mail or password not provided')
 
-        self._http_post('https://account.nicovideo.jp/api/v1/login', data={
+        resp = self._http_post('https://account.nicovideo.jp/api/v1/login', data={
             'mail_tel': self.mail,
             'password': self.password,
-        }, allow_redirects=False).raise_for_status()
-        if self.user_session() is None:
-            raise LoginFailed('mail or password is incorrect')
+        }, allow_redirects=False)
+        resp.raise_for_status()
+        for cookie in resp.cookies:
+            if cookie.name == 'user_session' or cookie.name == 'user_session_secure':
+                return True
+        return False
 
     def _ts_watch_num(self, vid):
         resp = self._http_post('https://live.nicovideo.jp/api/watchingreservation', data={
