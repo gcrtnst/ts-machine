@@ -27,7 +27,7 @@ def _login_if_required(func):
         try:
             return func(self, *args, **kwargs)
         except LoginRequired:
-            raise LoginFailed
+            raise LoginFailed('login failed for unknown reason')
     return wrapper
 
 
