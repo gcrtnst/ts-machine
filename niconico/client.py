@@ -108,8 +108,8 @@ class Niconico:
         resp.raise_for_status()
         for cookie in resp.cookies:
             if cookie.name == 'user_session' or cookie.name == 'user_session_secure':
-                return True
-        return False
+                return
+        raise LoginFailed('mail or password is incorrect')
 
     def _ts_watch_num(self, vid):
         resp = self._http_post('https://live.nicovideo.jp/api/watchingreservation', data={
