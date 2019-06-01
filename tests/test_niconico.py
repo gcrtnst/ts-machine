@@ -44,6 +44,22 @@ class TestNiconico(unittest.TestCase):
         self.assertEqual(n.mock_calls, [call.login()])
         self.assertEqual(func.mock_calls, [call(n), call(n)])
 
+    def test_contents_search_filters_data(self):
+        filters = {
+            'userId': 0,
+            'channelId': [0, 1, 2],
+            'startTime': {'gt': datetime(1, 1, 1), 'lt': datetime(1, 1, 2)},
+        }
+        data = {
+            'filters[userId][1]': '0',
+            'filters[channelId][1]': '0',
+            'filters[channelId][2]': '1',
+            'filters[channelId][3]': '2',
+            'filters[startTime][gt]': '0001-01-01T00:00:00',
+            'filters[startTime][lt]': '0001-01-02T00:00:00',
+        }
+        self.assertEqual(niconico.client._contents_search_filters_data(filters), data)
+
     def test_contents_search_filters_value(self):
         for c in [
                 (datetime(1, 1, 1), '0001-01-01T00:00:00'),
