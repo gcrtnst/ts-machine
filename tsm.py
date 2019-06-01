@@ -183,6 +183,28 @@ class TSMachine:
         self.print_diff(ts_list_before, ts_list_after)
 
 
+def load_config(f):
+    file = toml.load(f)
+
+    config = {
+        'login': {},
+        'search': {
+            'targets': ['title', 'description', 'tags'],
+            'sort': '+startTime',
+            'startAfter': '30m',
+        },
+        'misc': {
+            'overwrite': False,
+            'timeout': 300,
+            'userAgent': 'ts-machine (private app)',
+            'context': 'ts-machine (private app)',
+        },
+    }
+    for tbl in file:
+        config[tbl].update(file[tbl])
+    return config
+
+
 @contextlib.contextmanager
 def lwp_cookiejar(*args, **kwargs):
     jar = LWPCookieJar(*args, **kwargs)
@@ -202,16 +224,7 @@ def main():
     argv = argp.parse_args()
 
     with argv.config.open() as f:
-        config = toml.load(f)
-    config['search']['targets'] = config['search'].get('targets', ['title', 'description', 'tags'])
-    config['search']['sort'] = config['search'].get('sort', '+startTime')
-    config['search']['startAfter'] = config['search'].get('startAfter', '30m')
-    config['misc'] = config.get('misc', {})
-    config['misc']['overwrite'] = config['misc'].get('overwrite', False)
-    config['misc']['timeout'] = config['misc'].get('timeout', 300)
-    config['misc']['userAgent'] = config['misc'].get('userAgent', 'ts-machine (private app)')
-    config['misc']['context'] = config['misc'].get('context', config['misc']['userAgent'])
-
+        config = load_config(f)
     with lwp_cookiejar(filename=config['login'].get('cookieJar')) as jar:
         tsm = TSMachine()
         tsm.mail = config['login']['mail']
