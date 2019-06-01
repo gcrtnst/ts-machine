@@ -47,10 +47,10 @@ class TestNiconico(unittest.TestCase):
 class TestNiconicoUtils(unittest.TestCase):
     def test_parse_id(self):
         for c in [
-                {'in': 10, 'out': (None, 10)},
-                {'in': '10', 'out': (None, 10)},
-                {'in': 'lv10', 'out': ('lv', 10)}]:
-            self.assertEqual(niconico.utils.parse_id(c['in']), c['out'])
+                (10, (None, 10)),
+                ('10', (None, 10)),
+                ('lv10', ('lv', 10))]:
+            self.assertEqual(niconico.utils.parse_id(c[0]), c[1])
 
         with self.assertRaises(InvalidContentID):
             niconico.utils.parse_id('lv')
