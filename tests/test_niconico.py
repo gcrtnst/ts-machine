@@ -70,6 +70,56 @@ class TestNiconico(unittest.TestCase):
         ]:
             self.assertEqual(niconico.client._contents_search_filters_value(c[0]), c[1])
 
+    def test_http_get(self):
+        n = Niconico()
+        n.timeout = None
+        n._session = Mock(spec_set=n._session)
+        n._http_get('url')
+        self.assertEqual(n._session.mock_calls, [call.get('url', timeout=None)])
+
+        n = Niconico()
+        n.timeout = 1
+        n._session = Mock(spec_set=n._session)
+        n._http_get('url')
+        self.assertEqual(n._session.mock_calls, [call.get('url', timeout=1)])
+
+        n = Niconico()
+        n.timeout = None
+        n._session = Mock(spec_set=n._session)
+        n._http_get('url', timeout=2)
+        self.assertEqual(n._session.mock_calls, [call.get('url', timeout=2)])
+
+        n = Niconico()
+        n.timeout = 1
+        n._session = Mock(spec_set=n._session)
+        n._http_get('url', timeout=2)
+        self.assertEqual(n._session.mock_calls, [call.get('url', timeout=2)])
+
+    def test_http_post(self):
+        n = Niconico()
+        n.timeout = None
+        n._session = Mock(spec_set=n._session)
+        n._http_post('url')
+        self.assertEqual(n._session.mock_calls, [call.post('url', timeout=None)])
+
+        n = Niconico()
+        n.timeout = 1
+        n._session = Mock(spec_set=n._session)
+        n._http_post('url')
+        self.assertEqual(n._session.mock_calls, [call.post('url', timeout=1)])
+
+        n = Niconico()
+        n.timeout = None
+        n._session = Mock(spec_set=n._session)
+        n._http_post('url', timeout=2)
+        self.assertEqual(n._session.mock_calls, [call.post('url', timeout=2)])
+
+        n = Niconico()
+        n.timeout = 1
+        n._session = Mock(spec_set=n._session)
+        n._http_post('url', timeout=2)
+        self.assertEqual(n._session.mock_calls, [call.post('url', timeout=2)])
+
 
 class TestNiconicoUtils(unittest.TestCase):
     def test_parse_id(self):
