@@ -17,6 +17,13 @@ from .exceptions import (CommunicationError, ContentSearchError,
                          TSReachedLimit, TSRegistrationExpired)
 
 
+def _http_raise_for_status(resp):
+    try:
+        resp.raise_for_status()
+    except requests.HTTPError as e:
+        raise CommunicationError(e)
+
+
 def _login_if_required(func):
     @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
@@ -103,7 +110,8 @@ class Niconico:
         return self._http_request('post', *args, **kwargs)
 
     def logout(self):
-        self._http_get('https://secure.nicovideo.jp/secure/logout', allow_redirects=False).raise_for_status()
+        resp = self._http_get('https://secure.nicovideo.jp/secure/logout', allow_redirects=False)
+        _http_raise_for_status(resp)
 
     def login(self):
         if self.mail is None or self.password is None:
@@ -113,7 +121,7 @@ class Niconico:
             'mail_tel': self.mail,
             'password': self.password,
         }, allow_redirects=False)
-        resp.raise_for_status()
+        _http_raise_for_status(resp)
         for cookie in resp.cookies:
             if cookie.name == 'user_session' or cookie.name == 'user_session_secure':
                 return
@@ -124,7 +132,7 @@ class Niconico:
             'mode': 'watch_num',
             'vid': vid,
         })
-        resp.raise_for_status()
+        _http_raise_for_status(resp)
         soup = BeautifulSoup(resp.text, 'html5lib')
 
         tag = soup.select_one('#reserve > button')
@@ -176,7 +184,7 @@ class Niconico:
             'vid': vid,
             'token': token,
         })
-        resp.raise_for_status()
+        _http_raise_for_status(resp)
 
         soup = BeautifulSoup(resp.text, 'html5lib')
         if soup.select_one('#regist_finished') is not None:
@@ -267,12 +275,12 @@ class Niconico:
         resp = self._http_get('https://ch.nicovideo.jp/ppv_live/' + channel_id + '/' + live_id)
         if resp.status_code == 404:
             return False
-        resp.raise_for_status()
+        _http_raise_for_status(resp)
         return True
 
     def server_time(self):
         resp = self._http_get('https://live.nicovideo.jp/api/getservertime')
-        resp.raise_for_status()
+        _http_raise_for_status(resp)
 
         match = self._re_server_time.search(resp.text)
         if not match:
