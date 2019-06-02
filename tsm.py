@@ -36,6 +36,7 @@ def _tsm_run(func):
             self.print_err('error: {}'.format(e))
         except (CommunicationError, LoginFailed, Timeout) as e:
             self.print_err('error: {}'.format(e))
+        return 1
     return wrapper
 
 
@@ -180,6 +181,7 @@ class TSMachine:
         iter_search = itertools.islice(iter_search, n)
         for content in iter_search:
             self.print(content['contentId'] + ': ' + content['title'])
+        return 0
 
     @_tsm_run
     def run_auto_reserve(self):
@@ -200,6 +202,7 @@ class TSMachine:
 
         ts_list_after = self._niconico.ts_list()
         self.print_diff(ts_list_before, ts_list_after)
+        return 0
 
 
 config_schema = {
@@ -295,9 +298,8 @@ def main():
         tsm.filters = config['search']
         tsm.overwrite = config['misc']['overwrite']
         if argv.search is not None:
-            tsm.run_search_only(argv.search)
-        else:
-            tsm.run_auto_reserve()
+            sys.exit(tsm.run_search_only(argv.search))
+        sys.exit(tsm.run_auto_reserve())
 
 
 if __name__ == '__main__':
