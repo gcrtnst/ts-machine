@@ -1,5 +1,10 @@
 class NiconicoException(Exception):
-    pass
+    def __init__(self, *args, **kwargs):
+        if len(args) == 1:
+            args = ('niconico: {}'.format(args[0]),)
+        elif len(args) > 1:
+            args = ('niconico: {}'.format(args),)
+        super().__init__(*args, **kwargs)
 
 
 class CommunicationError(NiconicoException):
