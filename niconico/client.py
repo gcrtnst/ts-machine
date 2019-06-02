@@ -84,15 +84,16 @@ class Niconico:
     def cookies(self, value):
         self._session.cookies = value
 
-    def _http_get(self, *args, **kwargs):
+    def _http_request(self, *args, **kwargs):
         if 'timeout' not in kwargs or kwargs['timeout'] is None:
             kwargs['timeout'] = self.timeout
-        return self._session.get(*args, **kwargs)
+        return self._session.request(*args, **kwargs)
+
+    def _http_get(self, *args, **kwargs):
+        return self._http_request('get', *args, **kwargs)
 
     def _http_post(self, *args, **kwargs):
-        if 'timeout' not in kwargs or kwargs['timeout'] is None:
-            kwargs['timeout'] = self.timeout
-        return self._session.post(*args, **kwargs)
+        return self._http_request('post', *args, **kwargs)
 
     def logout(self):
         self._http_get('https://secure.nicovideo.jp/secure/logout', allow_redirects=False).raise_for_status()
