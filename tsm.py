@@ -258,8 +258,14 @@ def main():
     argp.add_argument('-s', '--search', type=int, nargs='?', const=10, metavar='N', help='search only mode; N specifies maximum number of programs to search (default: %(const)s)')
     argv = argp.parse_args()
 
-    with argv.config.open() as f:
-        config = load_config(f)
+    try:
+        with argv.config.open() as f:
+            config = load_config(f)
+    except OSError as e:
+        sys.exit('error: config: ' + e.strerror)
+    except ConfigError as e:
+        sys.exit('error: ' + str(e))
+
     with lwp_cookiejar(filename=config['login'].get('cookieJar')) as jar:
         tsm = TSMachine()
         tsm.mail = config['login']['mail']
