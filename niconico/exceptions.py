@@ -2,6 +2,14 @@ class NiconicoException(Exception):
     pass
 
 
+class CommunicationError(NiconicoException):
+    pass
+
+
+class Timeout(CommunicationError):
+    pass
+
+
 class InvalidResponse(NiconicoException):
     pass
 

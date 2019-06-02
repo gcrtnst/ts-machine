@@ -6,13 +6,15 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 
 import dateutil.parser
+import requests
 from bs4 import BeautifulSoup
 from requests import Session
 
 from . import utils
-from .exceptions import (ContentSearchError, InvalidResponse, LoginFailed,
-                         LoginRequired, NotFound, TSAlreadyRegistered,
-                         TSNotSupported, TSReachedLimit, TSRegistrationExpired)
+from .exceptions import (CommunicationError, ContentSearchError,
+                         InvalidResponse, LoginFailed, LoginRequired, NotFound,
+                         Timeout, TSAlreadyRegistered, TSNotSupported,
+                         TSReachedLimit, TSRegistrationExpired)
 
 
 def _login_if_required(func):
@@ -84,10 +86,15 @@ class Niconico:
     def cookies(self, value):
         self._session.cookies = value
 
-    def _http_request(self, *args, **kwargs):
+    def _http_request(self, method, url, *args, **kwargs):
         if 'timeout' not in kwargs or kwargs['timeout'] is None:
             kwargs['timeout'] = self.timeout
-        return self._session.request(*args, **kwargs)
+        try:
+            return self._session.request(method, url, *args, **kwargs)
+        except requests.Timeout:
+            raise Timeout('connection to ' + url + ' timed out')
+        except (requests.ConnectionError, requests.HTTPError, requests.TooManyRedirects) as e:
+            raise CommunicationError(e)
 
     def _http_get(self, *args, **kwargs):
         return self._http_request('get', *args, **kwargs)
