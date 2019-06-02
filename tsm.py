@@ -253,7 +253,7 @@ def lwp_cookiejar(*args, **kwargs):
 
 
 def main():
-    argp = ArgumentParser()
+    argp = ArgumentParser(prog='tsm')
     argp.add_argument('-c', '--config', type=Path, default=Path('~', '.tsm').expanduser(), help='TOML-formatted configuration file (default: %(default)s)')
     argp.add_argument('-s', '--search', type=int, nargs='?', const=10, metavar='N', help='search only mode; N specifies maximum number of programs to search (default: %(const)s)')
     argv = argp.parse_args()
