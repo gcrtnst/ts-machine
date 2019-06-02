@@ -9,6 +9,7 @@ from pathlib import Path
 
 import dateutil.tz
 import toml
+from cerberus import Validator
 
 from niconico import (Niconico, TSAlreadyRegistered, TSReachedLimit,
                       TSRegistrationExpired)
@@ -183,26 +184,60 @@ class TSMachine:
         self.print_diff(ts_list_before, ts_list_after)
 
 
-def load_config(f):
-    file = toml.load(f)
+config_schema = {
+    'login': {
+        'type': 'dict',
+        'required': True,
+        'schema': {
+            'mail': {'type': 'string', 'required': True},
+            'password': {'type': 'string', 'required': True},
+            'cookieJar': {'type': 'string'},
+        },
+    },
+    'search': {
+        'type': 'dict',
+        'required': True,
+        'schema': {
+            'q': {'type': 'string', 'required': True},
+            'targets': {'type': 'list', 'valuesrules': {'type': 'string'}, 'default': ['title', 'description', 'tags']},
+            'sort': {'type': 'string', 'default': '+startTime'},
+            'userId': {'type': 'list', 'valuesrules': {'type': 'integer'}},
+            'channelId': {'type': 'list', 'valuesrules': {'type': 'integer'}},
+            'communityId': {'type': 'list', 'valuesrules': {'type': 'integer'}},
+            'tags': {'anyof': [
+                {'type': 'list', 'valuesrules': {'type': 'string'}},
+                {'type': 'string'},
+            ]},
+            'openBefore': {'type': 'string'},
+            'openAfter': {'type': 'string'},
+            'startBefore': {'type': 'string'},
+            'startAfter': {'type': 'string', 'default': '30m'},
+            'scoreTimeshiftReserved': {'type': 'integer', 'min': 0},
+            'memberOnly': {'type': 'boolean'},
+            'ppv': {'type': 'boolean'},
+        },
+    },
+    'misc': {
+        'type': 'dict',
+        'schema': {
+            'overwrite': {'type': 'boolean', 'default': False},
+            'timeout': {'anyof': [{'type': 'integer'}, {'type': 'float'}], 'default': 300},
+            'userAgent': {'type': 'string', 'default': 'ts-machine (private app)'},
+            'context': {'type': 'string', 'default': 'ts-machine (private app)'},
+        },
+    },
+}
 
-    config = {
-        'login': {},
-        'search': {
-            'targets': ['title', 'description', 'tags'],
-            'sort': '+startTime',
-            'startAfter': '30m',
-        },
-        'misc': {
-            'overwrite': False,
-            'timeout': 300,
-            'userAgent': 'ts-machine (private app)',
-            'context': 'ts-machine (private app)',
-        },
-    }
-    for tbl in file:
-        config[tbl].update(file[tbl])
-    return config
+
+class ConfigError(Exception):
+    pass
+
+
+def load_config(f):
+    v = Validator(config_schema)
+    if not v.validate(toml.load(f)):
+        raise ConfigError('config: {}'.format(v.errors))
+    return v.document
 
 
 @contextlib.contextmanager
