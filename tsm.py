@@ -221,7 +221,7 @@ config_schema = {
         'type': 'dict',
         'schema': {
             'overwrite': {'type': 'boolean', 'default': False},
-            'timeout': {'anyof': [{'type': 'integer'}, {'type': 'float'}], 'default': 300},
+            'timeout': {'type': 'float', 'default': 300},
             'userAgent': {'type': 'string', 'default': 'ts-machine (private app)'},
             'context': {'type': 'string', 'default': 'ts-machine (private app)'},
         },
