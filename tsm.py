@@ -1,4 +1,5 @@
 import contextlib
+import functools
 import itertools
 import re
 import sys
@@ -11,7 +12,8 @@ import dateutil.tz
 import toml
 from cerberus import Validator
 
-from niconico import (Niconico, TSAlreadyRegistered, TSReachedLimit,
+from niconico import (CommunicationError, ContentSearchError, LoginFailed,
+                      Niconico, Timeout, TSAlreadyRegistered, TSReachedLimit,
                       TSRegistrationExpired)
 
 
@@ -21,6 +23,20 @@ def parse_timedelta(s):
         raise ValueError('invalid timedelta: "{}"'.format(s))
     kwargs = {name: int(value) for (name, value) in match.groupdict().items() if value is not None}
     return timedelta(**kwargs)
+
+
+def _tsm_run(func):
+    @functools.wraps(func)
+    def wrapper(self, *args, **kwargs):
+        try:
+            return func(self, *args, **kwargs)
+        except ContentSearchError as e:
+            if e.meta['status'] == 400:
+                raise
+            self.print_err('error: {}'.format(e))
+        except (CommunicationError, LoginFailed, Timeout) as e:
+            self.print_err('error: {}'.format(e))
+    return wrapper
 
 
 class TSMachine:
@@ -158,12 +174,14 @@ class TSMachine:
                 continue
             self.print('removed: ' + ts['vid'] + ': ' + ts['title'])
 
+    @_tsm_run
     def run_search_only(self, n):
         iter_search = self.iter_search(fields={'contentId', 'title'})
         iter_search = itertools.islice(iter_search, n)
         for content in iter_search:
             self.print(content['contentId'] + ': ' + content['title'])
 
+    @_tsm_run
     def run_auto_reserve(self):
         ts_list_before = self._niconico.ts_list()
         for content in self.iter_search(fields={'contentId'}):
