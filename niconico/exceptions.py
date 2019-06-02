@@ -48,5 +48,5 @@ class TSReachedLimit(NiconicoException):
 
 class ContentSearchError(NiconicoException):
     def __init__(self, *args, **kwargs):
-        self.code = kwargs.pop('code', None)
+        self.meta = kwargs.pop('meta', None)
         super().__init__(*args, **kwargs)

@@ -254,7 +254,7 @@ class Niconico:
             if 'meta' not in resp_json:
                 raise InvalidResponse('contents search failed with invalid response')
             if resp_json['meta']['status'] != 200:
-                raise ContentSearchError(resp_json['meta']['errorMessage'], code=resp_json['meta']['errorCode'])
+                raise ContentSearchError(resp_json['meta']['errorCode'] + ': ' + resp_json['meta']['errorMessage'], meta=resp_json['meta'])
             if not resp_json['data']:
                 break
 
