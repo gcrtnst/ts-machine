@@ -74,26 +74,26 @@ class TestNiconico(unittest.TestCase):
         n = Niconico()
         n.timeout = None
         n._session = Mock(spec_set=n._session)
-        n._http_request()
-        self.assertEqual(n._session.mock_calls, [call.request(timeout=None)])
+        n._http_request('method', 'url')
+        self.assertEqual(n._session.mock_calls, [call.request('method', 'url', timeout=None)])
 
         n = Niconico()
         n.timeout = 1
         n._session = Mock(spec_set=n._session)
-        n._http_request()
-        self.assertEqual(n._session.mock_calls, [call.request(timeout=1)])
+        n._http_request('method', 'url')
+        self.assertEqual(n._session.mock_calls, [call.request('method', 'url', timeout=1)])
 
         n = Niconico()
         n.timeout = None
         n._session = Mock(spec_set=n._session)
-        n._http_request(timeout=2)
-        self.assertEqual(n._session.mock_calls, [call.request(timeout=2)])
+        n._http_request('method', 'url', timeout=2)
+        self.assertEqual(n._session.mock_calls, [call.request('method', 'url', timeout=2)])
 
         n = Niconico()
         n.timeout = 1
         n._session = Mock(spec_set=n._session)
-        n._http_request(timeout=2)
-        self.assertEqual(n._session.mock_calls, [call.request(timeout=2)])
+        n._http_request('method', 'url', timeout=2)
+        self.assertEqual(n._session.mock_calls, [call.request('method', 'url', timeout=2)])
 
     def test_login(self):
         n = Niconico()
