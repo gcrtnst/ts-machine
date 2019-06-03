@@ -95,6 +95,44 @@ class TestNiconico(unittest.TestCase):
         n._http_request(timeout=2)
         self.assertEqual(n._session.mock_calls, [call.request(timeout=2)])
 
+    def test_login(self):
+        n = Niconico()
+        n.mail = None
+        n.password = None
+        n._http_request = Mock(spec_set=n._http_request)
+        with self.assertRaises(LoginFailed):
+            n.login()
+        self.assertEqual(n._http_request.mock_calls, [])
+
+        resp = Mock()
+        resp.cookies = []
+        n = Niconico()
+        n.mail = 'mail@example.com'
+        n.password = 'password'
+        n._http_request = Mock(spec_set=n._http_request, return_value=resp)
+        with self.assertRaises(LoginFailed):
+            n.login()
+        self.assertEqual(n._http_request.mock_calls, [call('post', 'https://account.nicovideo.jp/api/v1/login', data={
+            'mail_tel': 'mail@example.com',
+            'password': 'password',
+        }, allow_redirects=False)])
+        self.assertEqual(resp.mock_calls, [call.raise_for_status()])
+
+        cookie = Mock()
+        cookie.name = 'user_session'
+        resp = Mock()
+        resp.cookies = [cookie]
+        n = Niconico()
+        n.mail = 'mail@example.com'
+        n.password = 'password'
+        n._http_request = Mock(spec_set=n._http_request, return_value=resp)
+        n.login()
+        self.assertEqual(n._http_request.mock_calls, [call('post', 'https://account.nicovideo.jp/api/v1/login', data={
+            'mail_tel': 'mail@example.com',
+            'password': 'password',
+        }, allow_redirects=False)])
+        self.assertEqual(resp.mock_calls, [call.raise_for_status()])
+
 
 class TestNiconicoUtils(unittest.TestCase):
     def test_parse_id(self):
