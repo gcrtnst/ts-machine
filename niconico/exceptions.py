@@ -47,7 +47,7 @@ class TSRegistrationExpired(NiconicoException):
     pass
 
 
-class TSReachedLimit(NiconicoException):
+class TSMaxExceeded(NiconicoException):
     pass
 
 
