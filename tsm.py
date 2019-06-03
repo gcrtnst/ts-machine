@@ -240,6 +240,7 @@ config_schema = {
     },
     'misc': {
         'type': 'dict',
+        'default': {},
         'schema': {
             'overwrite': {'type': 'boolean', 'default': False},
             'timeout': {'type': 'number', 'default': 300},
