@@ -47,6 +47,8 @@ class TSMachine:
 
         self.filters = {}
         self.overwrite = False
+        self.max_reservation_warning = True
+        self.registration_expired_warning = True
         self.stdout = sys.stdout
         self.stderr = sys.stderr
 
@@ -194,10 +196,12 @@ class TSMachine:
             except TSAlreadyRegistered:
                 continue
             except TSRegistrationExpired:
-                self.print_err('warning: timeshift registration expired for ' + content['contentId'])
+                if self.registration_expired_warning:
+                    self.print_err('warning: timeshift registration expired for ' + content['contentId'])
                 continue
             except TSMaxExceeded:
-                self.print_err('warning: max timeshift reservation exceeded')
+                if self.max_reservation_warning:
+                    self.print_err('warning: max timeshift reservation exceeded')
                 break
 
         ts_list_after = self._niconico.ts_list()
@@ -236,6 +240,14 @@ config_schema = {
             'scoreTimeshiftReserved': {'type': 'integer', 'min': 0},
             'memberOnly': {'type': 'boolean'},
             'ppv': {'type': 'boolean'},
+        },
+    },
+    'warn': {
+        'type': 'dict',
+        'default': {},
+        'schema': {
+            'registrationExpired': {'type': 'boolean', 'default': True},
+            'maxReservation': {'type': 'boolean', 'default': True},
         },
     },
     'misc': {
@@ -298,6 +310,8 @@ def main():
         tsm.context = config['misc']['context']
         tsm.filters = config['search']
         tsm.overwrite = config['misc']['overwrite']
+        tsm.registration_expired_warning = config['warn']['registrationExpired']
+        tsm.max_reservation_warning = config['warn']['maxReservation']
         if argv.search is not None:
             sys.exit(tsm.run_search_only(argv.search))
         sys.exit(tsm.run_auto_reserve())
