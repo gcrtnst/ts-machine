@@ -195,13 +195,13 @@ class TSMachine:
                 self.ts_register(content['contentId'])
             except TSAlreadyRegistered:
                 continue
-            except TSRegistrationExpired:
+            except TSRegistrationExpired as e:
                 if self.registration_expired_warning:
-                    self.print_err('warning: timeshift registration expired for ' + content['contentId'])
+                    self.print_err('warning: {}'.format(e))
                 continue
-            except TSMaxReservation:
+            except TSMaxReservation as e:
                 if self.max_reservation_warning:
-                    self.print_err('warning: max timeshift reservation exceeded')
+                    self.print_err('warning: {}'.format(e))
                 break
 
         ts_list_after = self._niconico.ts_list()
