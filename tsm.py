@@ -157,11 +157,11 @@ class TSMachine:
             yield {k: v for k, v in content.items() if k in fields}
 
     def print(self, *args, **kwargs):
-        kwargs['file'] = kwargs.get('file', self.stdout)
+        kwargs['file'] = self.stdout
         print(*args, **kwargs)
 
     def print_err(self, *args, **kwargs):
-        kwargs['file'] = kwargs.get('file', self.stderr)
+        kwargs['file'] = self.stderr
         print(*args, **kwargs)
 
     def print_diff(self, ts_list_before, ts_list_after):
