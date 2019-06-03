@@ -168,7 +168,7 @@ class TSMachine:
         for ts in ts_list_after:
             if ts['vid'] in (ts['vid'] for ts in ts_list_before):
                 continue
-            self.print('added:   ' + ts['vid'] + ': ' + ts['title'])
+            self.print('added: ' + ts['vid'] + ': ' + ts['title'])
 
         for ts in ts_list_before:
             if ts['vid'] in (ts['vid'] for ts in ts_list_after):
