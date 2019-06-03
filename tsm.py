@@ -13,7 +13,7 @@ import toml
 from cerberus import Validator
 
 from niconico import (CommunicationError, ContentSearchError, LoginFailed,
-                      Niconico, Timeout, TSAlreadyRegistered, TSMaxExceeded,
+                      Niconico, Timeout, TSAlreadyRegistered, TSMaxReservation,
                       TSRegistrationExpired)
 
 
@@ -199,7 +199,7 @@ class TSMachine:
                 if self.registration_expired_warning:
                     self.print_err('warning: timeshift registration expired for ' + content['contentId'])
                 continue
-            except TSMaxExceeded:
+            except TSMaxReservation:
                 if self.max_reservation_warning:
                     self.print_err('warning: max timeshift reservation exceeded')
                 break

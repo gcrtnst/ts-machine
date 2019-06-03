@@ -13,7 +13,7 @@ from requests import Session
 from . import utils
 from .exceptions import (CommunicationError, ContentSearchError,
                          InvalidResponse, LoginFailed, LoginRequired, NotFound,
-                         Timeout, TSAlreadyRegistered, TSMaxExceeded,
+                         Timeout, TSAlreadyRegistered, TSMaxReservation,
                          TSNotSupported, TSRegistrationExpired)
 
 
@@ -171,7 +171,7 @@ class Niconico:
         if tag is not None:
             # Time shift reserve limit reached.
             if tag.text == '\u30bf\u30a4\u30e0\u30b7\u30d5\u30c8\u306e\u4e88\u7d04\u4e0a\u9650\u306b\u9054\u3057\u307e\u3057\u305f\u3002':
-                raise TSMaxExceeded('max timeshift reservation exceeded')
+                raise TSMaxReservation('max timeshift reservation exceeded')
 
         tag = soup.select_one('#reserve > a > span')
         if tag is not None and tag.text == '\u8996\u8074\u3059\u308b':  # watch
@@ -196,7 +196,7 @@ class Niconico:
             if tag.text == '\u30bf\u30a4\u30e0\u30b7\u30d5\u30c8\u4e88\u7d04\u306e\u3054\u5229\u7528\u306f\u3001\u30ed\u30b0\u30a4\u30f3\u304c\u5fc5\u8981\u3067\u3059\u3002':
                 raise LoginRequired('login is required for timeshift registration')
         if soup.select_one('#overwrite') is not None:
-            raise TSMaxExceeded('max timeshift reservation exceeded')
+            raise TSMaxReservation('max timeshift reservation exceeded')
         raise InvalidResponse('failed to register timeshift for lv' + vid + ' with invalid response')
 
     @_login_if_required
