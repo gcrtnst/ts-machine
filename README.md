@@ -35,17 +35,19 @@ optional arguments:
 ||communityId|integer array|yes||コミュニティID|
 ||providerType|string array|yes||放送元種別(`"official"`, `"community"`, `"channel"`)|
 ||tags|string array|yes||タグ|
-||openBefore|string|yes||今から何時間以内に開場するか("1h30m" などの形式で指定)|
-||openAfter|string|yes||今から何時間以降に開場するか("1h30m" などの形式で指定)|
-||startBefore|string|yes||今から何時間以内に放送開始するか("1h30m" などの形式で指定)|
-||startAfter|string|yes|`"30m"`|今から何時間以降に放送開始するか("1h30m" などの形式で指定)|
+||openBefore|string|yes||今から何時間以内に開場するか(`"1h30m"` などの形式で指定)|
+||openAfter|string|yes||今から何時間以降に開場するか(`"1h30m"` などの形式で指定)|
+||startBefore|string|yes||今から何時間以内に放送開始するか(`"1h30m"` などの形式で指定)|
+||startAfter|string|yes|`"30m"`|今から何時間以降に放送開始するか(`"1h30m"` などの形式で指定)|
 ||scoreTimeshiftReserved|integer|yes||タイムシフト予約者数の下限|
 ||memberOnly|bool|yes||チャンネル・コミュニティ限定か|
 ||ppv|bool|yes||有料放送か(ネットチケットが必要か)|
+|warn|registrationExpired|bool|yes|`true`|タイムシフト予約が申し込み期限切れだった場合に警告します。|
+||maxReservation|bool|yes|`true`|タイムシフトの予約上限に達した場合に警告します。|
 |misc|overwrite|bool|yes|`false`|視聴期限が切れたタイムシフト予約を上書きします。|
-||timeout|float|yes|`300`|サーバーのレスポンスが受信できなくなってから指定秒数経過すると処理を中断します。|
-||userAgent|string|yes|`ts-machine (private app)`|HTTP リクエストの User-Agent ヘッダ。|
-||context|string|yes|`ts-machine (private app)`|[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)の \_context クエリパラメータ。|
+||timeout|number|yes|`300`|サーバーのレスポンスが受信できなくなってから指定秒数経過すると処理を中断します。|
+||userAgent|string|yes|`ts-machine (private app)`|HTTP リクエストの User-Agent ヘッダ|
+||context|string|yes|`ts-machine (private app)`|[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)の \_context クエリパラメータ|
 
 #### 設定例
 今から2時間以内に放送開始される、公式の将棋番組をタイムシフト予約する場合の設定。
