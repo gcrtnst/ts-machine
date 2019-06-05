@@ -41,6 +41,7 @@ optional arguments:
 ||startAfter|string|yes|`"30m"`|今から何時間以降に放送開始するか(`"1h30m"` などの形式で指定)|
 ||scoreTimeshiftReserved|integer|yes||タイムシフト予約者数の下限|
 ||memberOnly|bool|yes||チャンネル・コミュニティ限定か|
+||liveStatus|string array|yes|`["reserved"]`|放送ステータス(`"past"`、`"onair"`、`"reserved"`)|
 ||ppv|bool|yes||有料放送か(ネットチケットが必要か)|
 |warn|registrationExpired|bool|yes|`true`|タイムシフト予約が申し込み期限切れだった場合に警告します。|
 ||maxReservation|bool|yes|`true`|タイムシフトの予約上限に達した場合に警告します。|

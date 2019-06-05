@@ -117,9 +117,8 @@ class TSMachine:
 
         filters = {
             'timeshiftEnabled': True,
-            'liveStatus': 'reserved',
         }
-        for key in ['userId', 'channelId', 'communityId', 'providerType', 'tags', 'memberOnly']:
+        for key in ['userId', 'channelId', 'communityId', 'providerType', 'tags', 'memberOnly', 'liveStatus']:
             if key in self.filters:
                 filters[key] = self.filters[key]
         for key, field, comp in [
@@ -239,6 +238,7 @@ config_schema = {
             'startAfter': {'type': 'string', 'default': '30m'},
             'scoreTimeshiftReserved': {'type': 'integer', 'min': 0},
             'memberOnly': {'type': 'boolean'},
+            'liveStatus': {'type': 'list', 'valuesrules': {'type': 'string'}, 'default': ['reserved']},
             'ppv': {'type': 'boolean'},
         },
     },
