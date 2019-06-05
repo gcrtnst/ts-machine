@@ -133,8 +133,14 @@ class TSMachine:
                 continue
             filters[field] = filters.get(field, {})
             filters[field][comp] = now + parse_timedelta(self.filters[key])
-        if 'scoreTimeshiftReserved' in self.filters:
-            filters['scoreTimeshiftReserved'] = {'gte': self.filters['scoreTimeshiftReserved']}
+        for key, field, comp in [
+                ('scoreTimeshiftReservedMin', 'scoreTimeshiftReserved', 'gte'),
+                ('scoreTimeshiftReservedMax', 'scoreTimeshiftReserved', 'lte'),
+        ]:
+            if key not in self.filters:
+                continue
+            filters[field] = filters.get(field, {})
+            filters[field][comp] = self.filters[key]
         return filters
 
     def match_ppv(self, live_id, channel_id):
@@ -245,7 +251,8 @@ config_schema = {
             'startAfter': {'type': 'string', 'default': '30m'},
             'liveEndBefore': {'type': 'string'},
             'liveEndAfter': {'type': 'string'},
-            'scoreTimeshiftReserved': {'type': 'integer', 'min': 0},
+            'scoreTimeshiftReservedMin': {'type': 'integer', 'min': 0},
+            'scoreTimeshiftReservedMax': {'type': 'integer', 'min': 0},
             'memberOnly': {'type': 'boolean'},
             'liveStatus': {'type': 'list', 'valuesrules': {'type': 'string'}, 'default': ['reserved']},
             'ppv': {'type': 'boolean'},
