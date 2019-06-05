@@ -134,6 +134,10 @@ class TSMachine:
             filters[field] = filters.get(field, {})
             filters[field][comp] = now + parse_timedelta(self.filters[key])
         for key, field, comp in [
+                ('viewCounterMin', 'viewCounter', 'gte'),
+                ('viewCounterMax', 'viewCounter', 'lte'),
+                ('commentCounterMin', 'commentCounter', 'gte'),
+                ('commentCounterMax', 'commentCounter', 'lte'),
                 ('scoreTimeshiftReservedMin', 'scoreTimeshiftReserved', 'gte'),
                 ('scoreTimeshiftReservedMax', 'scoreTimeshiftReserved', 'lte'),
         ]:
@@ -245,6 +249,10 @@ config_schema = {
                 {'type': 'list', 'valuesrules': {'type': 'string'}},
                 {'type': 'string'},
             ]},
+            'viewCounterMin': {'type': 'integer', 'min': 0},
+            'viewCounterMax': {'type': 'integer', 'min': 0},
+            'commentCounterMin': {'type': 'integer', 'min': 0},
+            'commentCounterMax': {'type': 'integer', 'min': 0},
             'openBefore': {'type': 'string'},
             'openAfter': {'type': 'string'},
             'startBefore': {'type': 'string'},
