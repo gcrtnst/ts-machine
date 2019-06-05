@@ -228,6 +228,7 @@ config_schema = {
             'userId': {'type': 'list', 'valuesrules': {'type': 'integer'}},
             'channelId': {'type': 'list', 'valuesrules': {'type': 'integer'}},
             'communityId': {'type': 'list', 'valuesrules': {'type': 'integer'}},
+            'providerType': {'type': 'list', 'valuesrules': {'type': 'string'}},
             'tags': {'anyof': [
                 {'type': 'list', 'valuesrules': {'type': 'string'}},
                 {'type': 'string'},
