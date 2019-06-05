@@ -126,6 +126,8 @@ class TSMachine:
                 ('openAfter', 'openTime', 'gte'),
                 ('startBefore', 'startTime', 'lte'),
                 ('startAfter', 'startTime', 'gte'),
+                ('liveEndBefore', 'liveEndTime', 'lte'),
+                ('liveEndAfter', 'liveEndTime', 'gte'),
         ]:
             if key not in self.filters:
                 continue
@@ -237,6 +239,8 @@ config_schema = {
             'openAfter': {'type': 'string'},
             'startBefore': {'type': 'string'},
             'startAfter': {'type': 'string', 'default': '30m'},
+            'liveEndBefore': {'type': 'string'},
+            'liveEndAfter': {'type': 'string'},
             'scoreTimeshiftReserved': {'type': 'integer', 'min': 0},
             'memberOnly': {'type': 'boolean'},
             'liveStatus': {'type': 'list', 'valuesrules': {'type': 'string'}, 'default': ['reserved']},
