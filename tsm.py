@@ -118,7 +118,7 @@ class TSMachine:
         filters = {
             'timeshiftEnabled': True,
         }
-        for key in ['userId', 'channelId', 'communityId', 'providerType', 'tags', 'memberOnly', 'liveStatus']:
+        for key in ['userId', 'channelId', 'communityId', 'providerType', 'tags', 'categoryTags', 'memberOnly', 'liveStatus']:
             if key in self.filters:
                 filters[key] = self.filters[key]
         for key, field, comp in [
@@ -232,6 +232,10 @@ config_schema = {
             'communityId': {'type': 'list', 'valuesrules': {'type': 'integer'}},
             'providerType': {'type': 'list', 'valuesrules': {'type': 'string'}},
             'tags': {'anyof': [
+                {'type': 'list', 'valuesrules': {'type': 'string'}},
+                {'type': 'string'},
+            ]},
+            'categoryTags': {'anyof': [
                 {'type': 'list', 'valuesrules': {'type': 'string'}},
                 {'type': 'string'},
             ]},
