@@ -40,12 +40,12 @@ optional arguments:
 ||viewCounterMax|integer|yes||来場者数の上限|
 ||commentCounterMin|integer|yes||コメント数の下限|
 ||commentCounterMax|integer|yes||コメント数の上限|
-||openBefore|string|yes||今から何時間以内に開場するか(`"1h30m"` などの形式で指定)|
-||openAfter|string|yes||今から何時間以降に開場するか(`"1h30m"` などの形式で指定)|
-||startBefore|string|yes||今から何時間以内に放送開始するか(`"1h30m"` などの形式で指定)|
-||startAfter|string|yes|`"30m"`|今から何時間以降に放送開始するか(`"1h30m"` などの形式で指定)|
-||liveEndBefore|string|yes||今から何時間以内に放送終了するか(`"1h30m"` などの形式で指定)|
-||liveEndAfter|string|yes||今から何時間以降に放送終了するか(`"1h30m"` などの形式で指定)|
+||openBefore|string(timedelta)|yes||今から何時間以内に開場するか|
+||openAfter|string(timedelta)|yes||今から何時間以降に開場するか|
+||startBefore|string(timedelta)|yes||今から何時間以内に放送開始するか|
+||startAfter|string(timedelta)|yes|`"30m"`|今から何時間以降に放送開始するか|
+||liveEndBefore|string(timedelta)|yes||今から何時間以内に放送終了するか|
+||liveEndAfter|string(timedelta)|yes||今から何時間以降に放送終了するか|
 ||scoreTimeshiftReservedMin|integer|yes||タイムシフト予約者数の下限|
 ||scoreTimeshiftReservedMax|integer|yes||タイムシフト予約者数の上限|
 ||memberOnly|bool|yes||チャンネル・コミュニティ限定か|
@@ -57,6 +57,17 @@ optional arguments:
 ||timeout|number|yes|`300`|サーバーのレスポンスが受信できなくなってから指定秒数経過すると処理を中断します。|
 ||userAgent|string|yes|`ts-machine (private app)`|HTTP リクエストの User-Agent ヘッダ|
 ||context|string|yes|`ts-machine (private app)`|[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)の \_context クエリパラメータ|
+
+#### timedelta 形式
+一部の設定項目は timedelta 形式の文字列を要求します。timedelta 形式は以下の正規表現で定義されています。
+```
+^((?P<weeks>\d+)w)?((?P<days>\d+)d)?((?P<hours>\d+)h)?((?P<minutes>\d+)m)?((?P<seconds>\d+)s)?((?P<milliseconds>\d+)ms)?((?P<microseconds>\d+)us)?$
+```
+
+例えば、「1時間30分」という時間を表す場合、以下のようになります。
+```
+1h30m
+```
 
 #### 設定例
 今から2時間以内に放送開始される、公式の将棋番組をタイムシフト予約する場合の設定。
