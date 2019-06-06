@@ -114,9 +114,6 @@ class TSMachine:
         self._niconico.ts_register(live_id, overwrite=self.overwrite)
 
     def contents_search_filters(self, now=None):
-        if now is None:
-            now = self._niconico.server_time()
-
         filters = {
             'timeshiftEnabled': True,
         }
@@ -133,6 +130,8 @@ class TSMachine:
         ]:
             if key not in self.filters or self.filters[key] == '':
                 continue
+            if now is None:
+                now = self._niconico.server_time()
             filters[field] = filters.get(field, {})
             filters[field][comp] = now + parse_timedelta(self.filters[key])
         for key, field, comp in [
