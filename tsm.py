@@ -113,9 +113,7 @@ class TSMachine:
         self._niconico.ts_register(live_id, overwrite=self.overwrite)
 
     def contents_search_filters(self, now=None):
-        filters = {
-            'timeshiftEnabled': True,
-        }
+        filters = {}
         for key, field, comp in [
                 ('openBefore', 'openTime', 'lte'),
                 ('openAfter', 'openTime', 'gte'),
