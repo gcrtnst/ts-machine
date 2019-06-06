@@ -43,13 +43,13 @@ optional arguments:
 ||openBefore|string(timedelta)|yes||今から何時間以内に開場するか|
 ||openAfter|string(timedelta)|yes||今から何時間以降に開場するか|
 ||startBefore|string(timedelta)|yes||今から何時間以内に放送開始するか|
-||startAfter|string(timedelta)|yes|`"30m"`|今から何時間以降に放送開始するか|
+||startAfter|string(timedelta)|yes|`"30m"`|今から何時間以降に放送開始するか。空文字列を設定すると無効化されます。|
 ||liveEndBefore|string(timedelta)|yes||今から何時間以内に放送終了するか|
 ||liveEndAfter|string(timedelta)|yes||今から何時間以降に放送終了するか|
 ||scoreTimeshiftReservedMin|integer|yes||タイムシフト予約者数の下限|
 ||scoreTimeshiftReservedMax|integer|yes||タイムシフト予約者数の上限|
 ||memberOnly|bool|yes||チャンネル・コミュニティ限定か|
-||liveStatus|string array|yes|`["reserved"]`|放送ステータス(`"past"`、`"onair"`、`"reserved"`)|
+||liveStatus|string array|yes|`["reserved"]`|放送ステータス(`"past"`、`"onair"`、`"reserved"`)。空の配列を設定すると無効化されます。|
 ||ppv|bool|yes||有料放送か(ネットチケットが必要か)|
 |warn|registrationExpired|bool|yes|`true`|タイムシフト予約が申し込み期限切れだった場合に警告します。|
 ||maxReservation|bool|yes|`true`|タイムシフトの予約上限に達した場合に警告します。|
