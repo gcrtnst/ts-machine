@@ -14,7 +14,7 @@ from cerberus import Validator
 
 from niconico import (CommunicationError, ContentSearchError, LoginFailed,
                       Niconico, Timeout, TSAlreadyRegistered, TSMaxReservation,
-                      TSRegistrationExpired)
+                      TSNotSupported, TSRegistrationExpired)
 
 _re_timedelta = re.compile(r'^((?P<weeks>-?[0-9]+)w)?((?P<days>-?[0-9]+)d)?((?P<hours>-?[0-9]+)h)?((?P<minutes>-?[0-9]+)m)?((?P<seconds>-?[0-9]+)s)?((?P<milliseconds>-?[0-9]+)ms)?((?P<microseconds>-?[0-9]+)us)?$')
 
@@ -49,7 +49,7 @@ class TSMachine:
 
         self.filters = {}
         self.overwrite = False
-        self.warnings = {'max_reservation', 'registration_expired'}
+        self.warnings = {'not_supported', 'max_reservation', 'registration_expired'}
         self.stdout = sys.stdout
         self.stderr = sys.stderr
 
@@ -187,6 +187,10 @@ class TSMachine:
                 continue
             try:
                 self.ts_register(content['contentId'])
+            except TSNotSupported as e:
+                if 'not_supported' in self.warnings:
+                    self.print_err('warning: {}'.format(e))
+                continue
             except TSAlreadyRegistered:
                 continue
             except TSRegistrationExpired as e:
@@ -233,6 +237,7 @@ config_schema = {
         'type': 'dict',
         'default': {},
         'schema': {
+            'notSupported': {'type': 'boolean', 'default': True},
             'registrationExpired': {'type': 'boolean', 'default': True},
             'maxReservation': {'type': 'boolean', 'default': True},
         },
@@ -298,6 +303,8 @@ def main():
         tsm.filters = config['search']
         tsm.overwrite = config['misc']['overwrite']
         tsm.warnings = set()
+        if config['warn']['notSupported']:
+            tsm.warnings.add('not_supported')
         if config['warn']['registrationExpired']:
             tsm.warnings.add('registration_expired')
         if config['warn']['maxReservation']:
