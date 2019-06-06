@@ -16,9 +16,11 @@ from niconico import (CommunicationError, ContentSearchError, LoginFailed,
                       Niconico, Timeout, TSAlreadyRegistered, TSMaxReservation,
                       TSRegistrationExpired)
 
+_re_timedelta = re.compile(r'^((?P<weeks>\d+)w)?((?P<days>\d+)d)?((?P<hours>\d+)h)?((?P<minutes>\d+)m)?((?P<seconds>\d+)s)?((?P<milliseconds>\d+)ms)?((?P<microseconds>\d+)us)?$')
+
 
 def parse_timedelta(s):
-    match = re.search(r'^((?P<weeks>\d+)w)?((?P<days>\d+)d)?((?P<hours>\d+)h)?((?P<minutes>\d+)m)?((?P<seconds>\d+)s)?((?P<milliseconds>\d+)ms)?((?P<microseconds>\d+)us)?$', s)
+    match = _re_timedelta.search(s)
     if not match:
         raise ValueError('invalid timedelta: "{}"'.format(s))
     kwargs = {name: int(value) for (name, value) in match.groupdict().items() if value is not None}
