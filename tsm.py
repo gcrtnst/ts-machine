@@ -130,6 +130,35 @@ class TSMachine:
             filters[field][comp] = now + parse_timedelta(self.filters[key])
         return filters
 
+    def contents_search_json_filter(self, now=None):
+        filters = []
+        for field, before, after in [
+                ('openTime', 'openBefore', 'openAfter'),
+                ('startTime', 'startBefore', 'startAfter'),
+                ('liveEndTime', 'liveEndBefore', 'liveEndAfter'),
+        ]:
+            if after not in self.filters and before not in self.filters:
+                continue
+            if now is None:
+                now = self._niconico.server_time()
+
+            f = {'type': 'range', 'field': field}
+            if after in self.filters:
+                dt = now + parse_timedelta(self.filters[after])
+                f['from'] = dt.isoformat(timespec='seconds')
+                f['include_lower'] = True
+            if before in self.filters:
+                dt = now + parse_timedelta(self.filters[before])
+                f['to'] = dt.isoformat(timespec='seconds')
+                f['include_upper'] = True
+            filters.append(f)
+
+        if len(filters) == 0:
+            return None
+        if len(filters) == 1:
+            return filters[0]
+        return {'type': 'and', 'filters': filters}
+
     def match_ppv(self, live_id, channel_id):
         if 'ppv' not in self.filters:
             return True
@@ -143,7 +172,7 @@ class TSMachine:
             service='live',
             targets=self.filters['targets'],
             fields=search_fields,
-            filters=self.contents_search_filters(),
+            json_filter=self.contents_search_json_filter(),
             sort=self.filters['sort'],
         )
 
