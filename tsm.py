@@ -16,7 +16,7 @@ from niconico import (CommunicationError, ContentSearchError, LoginFailed,
                       Niconico, Timeout, TSAlreadyRegistered, TSMaxReservation,
                       TSRegistrationExpired)
 
-_re_timedelta = re.compile(r'^((?P<weeks>[0-9]+)w)?((?P<days>[0-9]+)d)?((?P<hours>[0-9]+)h)?((?P<minutes>[0-9]+)m)?((?P<seconds>[0-9]+)s)?((?P<milliseconds>[0-9]+)ms)?((?P<microseconds>[0-9]+)us)?$')
+_re_timedelta = re.compile(r'^((?P<weeks>-?[0-9]+)w)?((?P<days>-?[0-9]+)d)?((?P<hours>-?[0-9]+)h)?((?P<minutes>-?[0-9]+)m)?((?P<seconds>-?[0-9]+)s)?((?P<milliseconds>-?[0-9]+)ms)?((?P<microseconds>-?[0-9]+)us)?$')
 
 
 def parse_timedelta(s):
