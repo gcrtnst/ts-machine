@@ -129,7 +129,7 @@ class TSMachine:
                 ('liveEndBefore', 'liveEndTime', 'lte'),
                 ('liveEndAfter', 'liveEndTime', 'gte'),
         ]:
-            if key not in self.filters:
+            if key not in self.filters or self.filters[key] == '':
                 continue
             filters[field] = filters.get(field, {})
             filters[field][comp] = now + parse_timedelta(self.filters[key])
