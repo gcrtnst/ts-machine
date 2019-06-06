@@ -121,17 +121,17 @@ class TSMachine:
                 ('startTime', 'startBefore', 'startAfter'),
                 ('liveEndTime', 'liveEndBefore', 'liveEndAfter'),
         ]:
-            if after not in self.filters and before not in self.filters:
+            if not self.filters.get(after) and not self.filters.get(before):
                 continue
             if now is None:
                 now = self._niconico.server_time()
 
             f = {'type': 'range', 'field': field}
-            if after in self.filters:
+            if self.filters.get(after):
                 dt = now + parse_timedelta(self.filters[after])
                 f['from'] = dt.isoformat(timespec='seconds')
                 f['include_lower'] = True
-            if before in self.filters:
+            if self.filters.get(before):
                 dt = now + parse_timedelta(self.filters[before])
                 f['to'] = dt.isoformat(timespec='seconds')
                 f['include_upper'] = True
