@@ -1,6 +1,7 @@
 import contextlib
 import functools
 import itertools
+import json
 import re
 import sys
 from argparse import ArgumentParser
@@ -114,6 +115,8 @@ class TSMachine:
 
     def contents_search_json_filter(self, now=None):
         filters = []
+        if self.filters.get('jsonFilter'):
+            filters.append(self.filters['jsonFilter'])
         if not self.filters.get('includeUnsupported'):
             filters.append({'type': 'equal', 'field': 'timeshiftEnabled', 'value': True})
         for field, before, after in [
@@ -237,6 +240,7 @@ config_schema = {
             'q': {'type': 'string', 'required': True},
             'targets': {'type': 'list', 'valuesrules': {'type': 'string'}, 'default': ['title', 'description', 'tags']},
             'sort': {'type': 'string', 'default': '+startTime'},
+            'jsonFilter': {'type': 'string'},
             'openBefore': {'type': 'string'},
             'openAfter': {'type': 'string'},
             'startBefore': {'type': 'string'},
@@ -305,6 +309,11 @@ def main():
         sys.exit("error: config file '{}': {}".format(argv.config, e.strerror))
     except ConfigError as e:
         sys.exit('error: ' + str(e))
+
+    if 'jsonFilter' in config['search']:
+        p = Path(config['search']['jsonFilter'])
+        with p.open() as f:
+            config['search']['jsonFilter'] = json.load(f)
 
     with lwp_cookiejar(filename=config['login'].get('cookieJar')) as jar:
         tsm = TSMachine()
