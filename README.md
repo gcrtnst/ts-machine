@@ -35,11 +35,19 @@ optional arguments:
 ||communityId|integer array|yes||コミュニティID|
 ||providerType|string array|yes||放送元種別(`"official"`, `"community"`, `"channel"`)|
 ||tags|string array|yes||タグ|
+||categoryTags|string array|yes||カテゴリタグ|
+||viewCounterMin|integer|yes||来場者数の下限|
+||viewCounterMax|integer|yes||来場者数の上限|
+||commentCounterMin|integer|yes||コメント数の下限|
+||commentCounterMax|integer|yes||コメント数の上限|
 ||openBefore|string|yes||今から何時間以内に開場するか(`"1h30m"` などの形式で指定)|
 ||openAfter|string|yes||今から何時間以降に開場するか(`"1h30m"` などの形式で指定)|
 ||startBefore|string|yes||今から何時間以内に放送開始するか(`"1h30m"` などの形式で指定)|
 ||startAfter|string|yes|`"30m"`|今から何時間以降に放送開始するか(`"1h30m"` などの形式で指定)|
-||scoreTimeshiftReserved|integer|yes||タイムシフト予約者数の下限|
+||liveEndBefore|string|yes||今から何時間以内に放送終了するか(`"1h30m"` などの形式で指定)|
+||liveEndAfter|string|yes||今から何時間以降に放送終了するか(`"1h30m"` などの形式で指定)|
+||scoreTimeshiftReservedMin|integer|yes||タイムシフト予約者数の下限|
+||scoreTimeshiftReservedMax|integer|yes||タイムシフト予約者数の上限|
 ||memberOnly|bool|yes||チャンネル・コミュニティ限定か|
 ||liveStatus|string array|yes|`["reserved"]`|放送ステータス(`"past"`、`"onair"`、`"reserved"`)|
 ||ppv|bool|yes||有料放送か(ネットチケットが必要か)|
