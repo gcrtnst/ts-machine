@@ -7,6 +7,7 @@ import sys
 from argparse import ArgumentParser
 from datetime import timedelta
 from http.cookiejar import LWPCookieJar
+from json import JSONDecodeError
 from pathlib import Path
 
 import dateutil.tz
@@ -320,8 +321,13 @@ def main():
 
     if 'jsonFilter' in config['search']:
         p = Path(config['search']['jsonFilter'])
-        with p.open() as f:
-            config['search']['jsonFilter'] = json.load(f)
+        try:
+            with p.open() as f:
+                config['search']['jsonFilter'] = json.load(f)
+        except OSError as e:
+            sys.exit("error: jsonFilter '{}': {}".format(config['search']['jsonFilter'], e.strerror))
+        except JSONDecodeError as e:
+            sys.exit("error: jsonFilter: {}".format(e))
 
     with lwp_cookiejar(filename=config['login'].get('cookieJar')) as jar:
         tsm = TSMachine()
