@@ -315,7 +315,7 @@ def main():
         with argv.config.open() as f:
             config = load_config(f)
     except OSError as e:
-        sys.exit("error: config file '{}': {}".format(argv.config, e.strerror))
+        sys.exit("error: config '{}': {}".format(argv.config, e.strerror))
     except ConfigError as e:
         sys.exit('error: ' + str(e))
 
