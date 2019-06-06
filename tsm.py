@@ -49,8 +49,7 @@ class TSMachine:
 
         self.filters = {}
         self.overwrite = False
-        self.max_reservation_warning = True
-        self.registration_expired_warning = True
+        self.warnings = {'max_reservation', 'registration_expired'}
         self.stdout = sys.stdout
         self.stderr = sys.stderr
 
@@ -208,11 +207,11 @@ class TSMachine:
             except TSAlreadyRegistered:
                 continue
             except TSRegistrationExpired as e:
-                if self.registration_expired_warning:
+                if 'registration_expired' in self.warnings:
                     self.print_err('warning: {}'.format(e))
                 continue
             except TSMaxReservation as e:
-                if self.max_reservation_warning:
+                if 'max_reservation' in self.warnings:
                     self.print_err('warning: {}'.format(e))
                 break
 
@@ -335,8 +334,11 @@ def main():
         tsm.context = config['misc']['context']
         tsm.filters = config['search']
         tsm.overwrite = config['misc']['overwrite']
-        tsm.registration_expired_warning = config['warn']['registrationExpired']
-        tsm.max_reservation_warning = config['warn']['maxReservation']
+        tsm.warnings = set()
+        if config['warn']['registrationExpired']:
+            tsm.warnings.add('registration_expired')
+        if config['warn']['maxReservation']:
+            tsm.warnings.add('max_reservation')
         if argv.search is not None:
             sys.exit(tsm.run_search_only(argv.search))
         sys.exit(tsm.run_auto_reserve())
