@@ -40,30 +40,6 @@ def _login_if_required(func):
     return wrapper
 
 
-def _contents_search_filters_data(filters):
-    data = {}
-    for field, value in filters.items():
-        if isinstance(value, list):
-            for i, v in enumerate(value):
-                data['filters[' + field + '][' + str(i + 1) + ']'] = _contents_search_filters_value(v)
-        elif isinstance(value, dict):
-            for k, v in value.items():
-                data['filters[' + field + '][' + k + ']'] = _contents_search_filters_value(v)
-        else:
-            data['filters[' + field + '][1]'] = _contents_search_filters_value(value)
-    return data
-
-
-def _contents_search_filters_value(value):
-    if isinstance(value, datetime):
-        return value.isoformat(timespec='seconds')
-    if isinstance(value, bool):
-        return 'true' if value else 'false'
-    if value is None:
-        return 'null'
-    return str(value)
-
-
 class Niconico:
     _re_ts_watch_num = re.compile(re.escape(r"Nicolive.TimeshiftActions.doRegister('lv") + '(?P<vid>[0-9]+)' + re.escape("','") + r'(?P<token>ulck_[0-9]+)' + re.escape(r"')"))
     _re_server_time = re.compile(re.escape(r'servertime=') + r'(?P<time>[0-9]+)')
@@ -230,7 +206,7 @@ class Niconico:
             })
         return items
 
-    def contents_search(self, q, service='video', targets=['title', 'description', 'tags'], fields=set(), filters={}, json_filter=None, sort='-viewCounter'):
+    def contents_search(self, q, service='video', targets=['title', 'description', 'tags'], fields=set(), json_filter=None, sort='-viewCounter'):
         service = urllib.parse.quote(service, safe='')
         data = {
             'q': q,
@@ -240,8 +216,6 @@ class Niconico:
         }
         if fields:
             data['fields'] = ','.join(fields)
-        if filters:
-            data.update(_contents_search_filters_data(filters))
         if json_filter is not None:
             data['jsonFilter'] = json.dumps(json_filter, allow_nan=False)
         if self.context is not None:

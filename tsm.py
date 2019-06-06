@@ -112,24 +112,6 @@ class TSMachine:
     def ts_register(self, live_id):
         self._niconico.ts_register(live_id, overwrite=self.overwrite)
 
-    def contents_search_filters(self, now=None):
-        filters = {}
-        for key, field, comp in [
-                ('openBefore', 'openTime', 'lte'),
-                ('openAfter', 'openTime', 'gte'),
-                ('startBefore', 'startTime', 'lte'),
-                ('startAfter', 'startTime', 'gte'),
-                ('liveEndBefore', 'liveEndTime', 'lte'),
-                ('liveEndAfter', 'liveEndTime', 'gte'),
-        ]:
-            if key not in self.filters or self.filters[key] == '':
-                continue
-            if now is None:
-                now = self._niconico.server_time()
-            filters[field] = filters.get(field, {})
-            filters[field][comp] = now + parse_timedelta(self.filters[key])
-        return filters
-
     def contents_search_json_filter(self, now=None):
         filters = []
         for field, before, after in [
