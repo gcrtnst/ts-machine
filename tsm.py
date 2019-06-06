@@ -116,9 +116,6 @@ class TSMachine:
         filters = {
             'timeshiftEnabled': True,
         }
-        for key in ['userId', 'channelId', 'communityId', 'providerType', 'tags', 'categoryTags', 'memberOnly', 'liveStatus']:
-            if key in self.filters:
-                filters[key] = self.filters[key]
         for key, field, comp in [
                 ('openBefore', 'openTime', 'lte'),
                 ('openAfter', 'openTime', 'gte'),
@@ -133,18 +130,6 @@ class TSMachine:
                 now = self._niconico.server_time()
             filters[field] = filters.get(field, {})
             filters[field][comp] = now + parse_timedelta(self.filters[key])
-        for key, field, comp in [
-                ('viewCounterMin', 'viewCounter', 'gte'),
-                ('viewCounterMax', 'viewCounter', 'lte'),
-                ('commentCounterMin', 'commentCounter', 'gte'),
-                ('commentCounterMax', 'commentCounter', 'lte'),
-                ('scoreTimeshiftReservedMin', 'scoreTimeshiftReserved', 'gte'),
-                ('scoreTimeshiftReservedMax', 'scoreTimeshiftReserved', 'lte'),
-        ]:
-            if key not in self.filters:
-                continue
-            filters[field] = filters.get(field, {})
-            filters[field][comp] = self.filters[key]
         return filters
 
     def match_ppv(self, live_id, channel_id):
@@ -237,32 +222,12 @@ config_schema = {
             'q': {'type': 'string', 'required': True},
             'targets': {'type': 'list', 'valuesrules': {'type': 'string'}, 'default': ['title', 'description', 'tags']},
             'sort': {'type': 'string', 'default': '+startTime'},
-            'userId': {'type': 'list', 'valuesrules': {'type': 'integer'}},
-            'channelId': {'type': 'list', 'valuesrules': {'type': 'integer'}},
-            'communityId': {'type': 'list', 'valuesrules': {'type': 'integer'}},
-            'providerType': {'type': 'list', 'valuesrules': {'type': 'string'}},
-            'tags': {'anyof': [
-                {'type': 'list', 'valuesrules': {'type': 'string'}},
-                {'type': 'string'},
-            ]},
-            'categoryTags': {'anyof': [
-                {'type': 'list', 'valuesrules': {'type': 'string'}},
-                {'type': 'string'},
-            ]},
-            'viewCounterMin': {'type': 'integer', 'min': 0},
-            'viewCounterMax': {'type': 'integer', 'min': 0},
-            'commentCounterMin': {'type': 'integer', 'min': 0},
-            'commentCounterMax': {'type': 'integer', 'min': 0},
             'openBefore': {'type': 'string'},
             'openAfter': {'type': 'string'},
             'startBefore': {'type': 'string'},
             'startAfter': {'type': 'string', 'default': '30m'},
             'liveEndBefore': {'type': 'string'},
             'liveEndAfter': {'type': 'string'},
-            'scoreTimeshiftReservedMin': {'type': 'integer', 'min': 0},
-            'scoreTimeshiftReservedMax': {'type': 'integer', 'min': 0},
-            'memberOnly': {'type': 'boolean'},
-            'liveStatus': {'type': 'list', 'valuesrules': {'type': 'string'}, 'default': ['reserved']},
             'ppv': {'type': 'boolean'},
         },
     },
