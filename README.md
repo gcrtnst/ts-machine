@@ -61,7 +61,7 @@ optional arguments:
 #### timedelta 形式
 一部の設定項目は timedelta 形式の文字列を要求します。timedelta 形式は以下の正規表現で定義されています。
 ```
-^((?P<weeks>\d+)w)?((?P<days>\d+)d)?((?P<hours>\d+)h)?((?P<minutes>\d+)m)?((?P<seconds>\d+)s)?((?P<milliseconds>\d+)ms)?((?P<microseconds>\d+)us)?$
+^((?P<weeks>-?[0-9]+)w)?((?P<days>-?[0-9]+)d)?((?P<hours>-?[0-9]+)h)?((?P<minutes>-?[0-9]+)m)?((?P<seconds>-?[0-9]+)s)?((?P<milliseconds>-?[0-9]+)ms)?((?P<microseconds>-?[0-9]+)us)?$
 ```
 
 例えば、「1時間30分」という時間を表す場合、以下のようになります。
