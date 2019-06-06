@@ -153,7 +153,9 @@ class TSMachine:
         return is_ppv == self.filters['ppv']
 
     def iter_search(self, fields=set()):
-        search_fields = {'contentId', 'channelId'} | set(fields)
+        search_fields = {'contentId'} | set(fields)
+        if 'ppv' in self.filters:
+            search_fields.add('channelId')
         iter_contents = self._niconico.contents_search(
             self.filters['q'],
             service='live',
@@ -164,7 +166,7 @@ class TSMachine:
         )
 
         for content in iter_contents:
-            if not self.match_ppv(content['contentId'], content['channelId']):
+            if 'ppv' in self.filters and not self.match_ppv(content['contentId'], content['channelId']):
                 continue
             yield {k: v for k, v in content.items() if k in fields}
 
