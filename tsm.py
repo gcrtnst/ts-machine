@@ -12,6 +12,7 @@ from pathlib import Path
 import dateutil.tz
 import toml
 from cerberus import Validator
+from toml import TomlDecodeError
 
 from niconico import (CommunicationError, ContentSearchError, LoginFailed,
                       Niconico, Timeout, TSAlreadyRegistered, TSMaxReservation,
@@ -280,8 +281,13 @@ class ConfigError(Exception):
 
 
 def load_config(f):
+    try:
+        t = toml.load(f)
+    except TomlDecodeError as e:
+        raise ConfigError('config: toml: {}'.format(e))
+
     v = Validator(config_schema)
-    if not v.validate(toml.load(f)):
+    if not v.validate(t):
         raise ConfigError('config: {}'.format(v.errors))
     return v.document
 
