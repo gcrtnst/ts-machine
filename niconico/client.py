@@ -51,7 +51,6 @@ class Niconico:
         self.timeout = None
         self.tz = None
         self._session = Session()
-        self._session.headers = {}
 
     @property
     def user_agent(self):
