@@ -269,8 +269,8 @@ config_schema = {
         'default': {},
         'schema': {
             'overwrite': {'type': 'boolean', 'default': False},
-            'timeout': {'type': 'number', 'default': None},
-            'userAgent': {'type': 'string', 'default': None},
+            'timeout': {'type': 'number'},
+            'userAgent': {'type': 'string'},
             'context': {'type': 'string', 'default': 'ts-machine (private app)'},
         },
     },
@@ -347,8 +347,8 @@ def main():
         tsm.mail = config['login']['mail']
         tsm.password = config['login']['password']
         tsm.cookies = jar
-        tsm.timeout = config['misc']['timeout']
-        tsm.user_agent = config['misc']['userAgent']
+        tsm.timeout = config['misc'].get('timeout')
+        tsm.user_agent = config['misc'].get('userAgent')
         tsm.context = config['misc']['context']
         tsm.filters = filters
         tsm.overwrite = config['misc']['overwrite']
