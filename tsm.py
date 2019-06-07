@@ -327,11 +327,11 @@ def main():
     except ConfigError as e:
         sys.exit('error: ' + str(e))
 
+    filters = config['search'].copy()
     if 'jsonFilter' in config['search']:
-        p = Path(config['search']['jsonFilter'])
         try:
-            with p.open() as f:
-                config['search']['jsonFilter'] = json.load(f)
+            with Path(config['search']['jsonFilter']).open() as f:
+                filters['jsonFilter'] = json.load(f)
         except OSError as e:
             sys.exit("error: jsonFilter '{}': {}".format(config['search']['jsonFilter'], e.strerror))
         except JSONDecodeError as e:
@@ -345,7 +345,7 @@ def main():
         tsm.timeout = config['misc']['timeout']
         tsm.user_agent = config['misc']['userAgent']
         tsm.context = config['misc']['context']
-        tsm.filters = config['search']
+        tsm.filters = filters
         tsm.overwrite = config['misc']['overwrite']
         tsm.warnings = set()
         if config['warn']['notSupported']:
