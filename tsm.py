@@ -285,14 +285,21 @@ def load_config(path):
     path = Path(path)
     try:
         with path.open() as f:
-            t = toml.load(f)
+            config = toml.load(f)
     except TomlDecodeError as e:
         raise ConfigError('config: toml: {}'.format(e))
 
     v = Validator(config_schema)
-    if not v.validate(t):
+    if not v.validate(config):
         raise ConfigError('config: {}'.format(v.errors))
-    return v.document
+    config = v.document
+
+    basepath = path.parent
+    if 'cookieJar' in config['login']:
+        config['login']['cookieJar'] = Path(basepath, config['login']['cookieJar'])
+    if 'jsonFilter' in config['search']:
+        config['search']['jsonFilter'] = Path(basepath, config['search']['jsonFilter'])
+    return config
 
 
 @contextlib.contextmanager
