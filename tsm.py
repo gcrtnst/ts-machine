@@ -270,7 +270,7 @@ config_schema = {
         'schema': {
             'overwrite': {'type': 'boolean', 'default': False},
             'timeout': {'type': 'number', 'default': None},
-            'userAgent': {'type': 'string', 'default': 'ts-machine (private app)'},
+            'userAgent': {'type': 'string', 'default': None},
             'context': {'type': 'string', 'default': 'ts-machine (private app)'},
         },
     },
