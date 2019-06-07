@@ -303,15 +303,20 @@ def load_config(path):
 
 
 @contextlib.contextmanager
-def lwp_cookiejar(*args, **kwargs):
-    jar = LWPCookieJar(*args, **kwargs)
-    if jar.filename is not None and Path(jar.filename).is_file():
-        jar.load()
+def lwp_cookiejar(filename=None, filemode=0o666):
+    if filename is not None:
+        filename = Path(filename)
+
+    jar = LWPCookieJar()
+    if filename is not None and filename.exists():
+        jar.load(str(filename))
     try:
         yield jar
     finally:
-        if jar.filename is not None:
-            jar.save()
+        if filename is None:
+            return
+        filename.touch(mode=filemode)
+        jar.save(str(filename))
 
 
 def main():
@@ -337,7 +342,7 @@ def main():
         except JSONDecodeError as e:
             sys.exit("error: jsonFilter: {}".format(e))
 
-    with lwp_cookiejar(filename=str(config['login'].get('cookieJar'))) as jar:
+    with lwp_cookiejar(filename=config['login'].get('cookieJar'), filemode=0o600) as jar:
         tsm = TSMachine()
         tsm.mail = config['login']['mail']
         tsm.password = config['login']['password']
