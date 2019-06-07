@@ -248,7 +248,7 @@ config_schema = {
             'openBefore': {'type': 'string'},
             'openAfter': {'type': 'string'},
             'startBefore': {'type': 'string'},
-            'startAfter': {'type': 'string', 'default': '30m'},
+            'startAfter': {'type': 'string'},
             'liveEndBefore': {'type': 'string'},
             'liveEndAfter': {'type': 'string'},
             'ppv': {'type': 'boolean'},
