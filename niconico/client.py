@@ -58,6 +58,10 @@ class Niconico:
 
     @user_agent.setter
     def user_agent(self, value):
+        if value is None:
+            if 'User-Agent' in self._session.headers:
+                del self._session.headers['User-Agent']
+            return
         self._session.headers['User-Agent'] = value
 
     @property
