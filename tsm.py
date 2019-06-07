@@ -337,7 +337,7 @@ def main():
         except JSONDecodeError as e:
             sys.exit("error: jsonFilter: {}".format(e))
 
-    with lwp_cookiejar(filename=config['login'].get('cookieJar')) as jar:
+    with lwp_cookiejar(filename=str(config['login'].get('cookieJar'))) as jar:
         tsm = TSMachine()
         tsm.mail = config['login']['mail']
         tsm.password = config['login']['password']
