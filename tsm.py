@@ -281,9 +281,11 @@ class ConfigError(Exception):
     pass
 
 
-def load_config(f):
+def load_config(path):
+    path = Path(path)
     try:
-        t = toml.load(f)
+        with path.open() as f:
+            t = toml.load(f)
     except TomlDecodeError as e:
         raise ConfigError('config: toml: {}'.format(e))
 
@@ -312,8 +314,7 @@ def main():
     argv = argp.parse_args()
 
     try:
-        with argv.config.open() as f:
-            config = load_config(f)
+        config = load_config(argv.config)
     except OSError as e:
         sys.exit("error: config '{}': {}".format(argv.config, e.strerror))
     except ConfigError as e:
