@@ -119,8 +119,6 @@ class TSMachine:
         filters = []
         if self.filters.get('jsonFilter'):
             filters.append(self.filters['jsonFilter'])
-        if not self.filters.get('includeUnsupported'):
-            filters.append({'type': 'equal', 'field': 'timeshiftEnabled', 'value': True})
         for field, before, after in [
                 ('openTime', 'openBefore', 'openAfter'),
                 ('startTime', 'startBefore', 'startAfter'),
@@ -252,7 +250,6 @@ config_schema = {
             'liveEndBefore': {'type': 'string'},
             'liveEndAfter': {'type': 'string'},
             'ppv': {'type': 'boolean'},
-            'includeUnsupported': {'type': 'boolean'},
         },
     },
     'warn': {
