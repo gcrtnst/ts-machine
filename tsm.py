@@ -19,14 +19,21 @@ from niconico import (CommunicationError, ContentSearchError, LoginFailed,
                       Niconico, Timeout, TSAlreadyRegistered, TSMaxReservation,
                       TSNotSupported, TSRegistrationExpired)
 
-_re_timedelta = re.compile(r'^((?P<weeks>-?[0-9]+)w)?((?P<days>-?[0-9]+)d)?((?P<hours>-?[0-9]+)h)?((?P<minutes>-?[0-9]+)m)?((?P<seconds>-?[0-9]+)s)?((?P<milliseconds>-?[0-9]+)ms)?((?P<microseconds>-?[0-9]+)us)?$')
+_re_timedelta = re.compile(r'^(?P<minus>-?)((?P<weeks>[0-9]+)w)?((?P<days>[0-9]+)d)?((?P<hours>[0-9]+)h)?((?P<minutes>[0-9]+)m)?((?P<seconds>[0-9]+)s)?((?P<milliseconds>[0-9]+)ms)?((?P<microseconds>[0-9]+)us)?$')
 
 
 def parse_timedelta(s):
     match = _re_timedelta.search(s)
     if not match:
         raise ValueError('invalid timedelta: "{}"'.format(s))
-    kwargs = {name: int(value) for (name, value) in match.groupdict().items() if value is not None}
+
+    kwargs = {}
+    for key in ['weeks', 'days', 'hours', 'minutes', 'seconds', 'milliseconds', 'microseconds']:
+        value = match.group(key)
+        if value is not None:
+            kwargs[key] = int(value)
+    if match.group('minus'):
+        return -timedelta(**kwargs)
     return timedelta(**kwargs)
 
 
