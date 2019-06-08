@@ -1,0 +1,5 @@
+{
+	"type": "equal",
+	"field": "timeshiftEnabled",
+	"value": true
+}
