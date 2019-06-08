@@ -52,7 +52,7 @@ class TSMachine:
 
         self.filters = {}
         self.overwrite = False
-        self.warnings = {'not_supported', 'max_reservation', 'registration_expired'}
+        self.warnings = {'ts_not_supported', 'ts_max_reservation', 'ts_registration_expired'}
         self.stdout = sys.stdout
         self.stderr = sys.stderr
 
@@ -206,17 +206,17 @@ class TSMachine:
             try:
                 self.ts_register(content['contentId'])
             except TSNotSupported as e:
-                if 'not_supported' in self.warnings:
+                if 'ts_not_supported' in self.warnings:
                     self.print_err('warning: {}'.format(e))
                 continue
             except TSAlreadyRegistered:
                 continue
             except TSRegistrationExpired as e:
-                if 'registration_expired' in self.warnings:
+                if 'ts_registration_expired' in self.warnings:
                     self.print_err('warning: {}'.format(e))
                 continue
             except TSMaxReservation as e:
-                if 'max_reservation' in self.warnings:
+                if 'ts_max_reservation' in self.warnings:
                     self.print_err('warning: {}'.format(e))
                 break
 
@@ -256,9 +256,9 @@ config_schema = {
         'type': 'dict',
         'default': {},
         'schema': {
-            'notSupported': {'type': 'boolean', 'default': True},
-            'registrationExpired': {'type': 'boolean', 'default': True},
-            'maxReservation': {'type': 'boolean', 'default': True},
+            'tsNotSupported': {'type': 'boolean', 'default': True},
+            'tsRegistrationExpired': {'type': 'boolean', 'default': True},
+            'tsMaxReservation': {'type': 'boolean', 'default': True},
         },
     },
     'misc': {
@@ -350,12 +350,12 @@ def main():
         tsm.filters = filters
         tsm.overwrite = config['misc']['overwrite']
         tsm.warnings = set()
-        if config['warn']['notSupported']:
-            tsm.warnings.add('not_supported')
-        if config['warn']['registrationExpired']:
-            tsm.warnings.add('registration_expired')
-        if config['warn']['maxReservation']:
-            tsm.warnings.add('max_reservation')
+        if config['warn']['tsNotSupported']:
+            tsm.warnings.add('ts_not_supported')
+        if config['warn']['tsRegistrationExpired']:
+            tsm.warnings.add('ts_registration_expired')
+        if config['warn']['tsMaxReservation']:
+            tsm.warnings.add('ts_max_reservation')
         if argv.search is not None:
             sys.exit(tsm.run_search_only(argv.search))
         sys.exit(tsm.run_auto_reserve())
