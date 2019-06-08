@@ -141,7 +141,7 @@ class TSMachine:
                 ('startTime', 'startTimeFrom', 'startTimeTo'),
                 ('liveEndTime', 'liveEndTimeFrom', 'liveEndTimeTo'),
         ]:
-            if timefrom in self.filters and timeto in self.filters:
+            if timefrom not in self.filters and timeto not in self.filters:
                 continue
             if now is None:
                 now = self._niconico.server_time()
