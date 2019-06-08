@@ -9,79 +9,13 @@ ts-machine はニコニコ生放送のタイムシフト予約を自動化する
   - 実行すると設定された通りに検索を行い、ヒットした番組をタイムシフト予約します。
   - cron 等で定期的に実行することを意図して制作しています。
 
-```
-usage: tsm.py [-h] [-c CONFIG] [-s [N]]
+### 設定ファイルの用意
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -c CONFIG, --config CONFIG
-                        TOML-formatted configuration file (default:
-                        ~/.tsm)
-  -s [N], --search [N]  search only mode; N specifies maximum number of
-                        programs to search (default: 10)
-```
+このレポジトリの config ディレクトリの中身を \~/.config/tsm ディレクトリにコピーしてください。
 
-### 設定ファイル(TOML)
-|テーブル|キー|型|省略可能か|デフォルト値|説明|
-|:-|:-|:-|:-|:-|:-|
-|login|mail|string|no||メールアドレス|
-||password|string|no||パスワード|
-||cookieJar|string|yes||クッキー保存先のファイル。LWPCookieJar を使用します。|
-|search|q|string|no||検索キーワード|
-||targets|string array|yes|`["title", "description", "tags"]`|検索対象。[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)のフィールドを指定できます。キーワード検索の場合は`["title", "description", "tags"]`、タグ検索の場合は`["tagsExact"]`を指定してください。|
-||sort|string|yes|`"+startTime"`|タイムシフト予約の登録順序。[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)の \_sort クエリパラメータと同様に指定してください。|
-||userId|integer array|yes||放送者のID|
-||channelId|integer array|yes||チャンネルID|
-||communityId|integer array|yes||コミュニティID|
-||providerType|string array|yes||放送元種別(`"official"`, `"community"`, `"channel"`)|
-||tags|string array|yes||タグ|
-||categoryTags|string array|yes||カテゴリタグ|
-||viewCounterMin|integer|yes||来場者数の下限|
-||viewCounterMax|integer|yes||来場者数の上限|
-||commentCounterMin|integer|yes||コメント数の下限|
-||commentCounterMax|integer|yes||コメント数の上限|
-||openBefore|string(timedelta)|yes||今から何時間以内に開場するか|
-||openAfter|string(timedelta)|yes||今から何時間以降に開場するか|
-||startBefore|string(timedelta)|yes||今から何時間以内に放送開始するか|
-||startAfter|string(timedelta)|yes|`"30m"`|今から何時間以降に放送開始するか。空文字列を設定すると無効化されます。|
-||liveEndBefore|string(timedelta)|yes||今から何時間以内に放送終了するか|
-||liveEndAfter|string(timedelta)|yes||今から何時間以降に放送終了するか|
-||scoreTimeshiftReservedMin|integer|yes||タイムシフト予約者数の下限|
-||scoreTimeshiftReservedMax|integer|yes||タイムシフト予約者数の上限|
-||memberOnly|bool|yes||チャンネル・コミュニティ限定か|
-||liveStatus|string array|yes|`["reserved"]`|放送ステータス(`"past"`、`"onair"`、`"reserved"`)。空の配列を設定すると無効化されます。|
-||ppv|bool|yes||有料放送か(ネットチケットが必要か)|
-|warn|registrationExpired|bool|yes|`true`|タイムシフト予約が申し込み期限切れだった場合に警告します。|
-||maxReservation|bool|yes|`true`|タイムシフトの予約上限に達した場合に警告します。|
-|misc|overwrite|bool|yes|`false`|視聴期限が切れたタイムシフト予約を上書きします。|
-||timeout|number|yes|`300`|サーバーのレスポンスが受信できなくなってから指定秒数経過すると処理を中断します。|
-||userAgent|string|yes|`ts-machine (private app)`|HTTP リクエストの User-Agent ヘッダ|
-||context|string|yes|`ts-machine (private app)`|[コンテンツ検索API](https://site.nicovideo.jp/search-api-docs/search.html)の \_context クエリパラメータ|
-
-#### timedelta 形式
-一部の設定項目は timedelta 形式の文字列を要求します。timedelta 形式は以下の正規表現で定義されています。
-```
-^((?P<weeks>-?[0-9]+)w)?((?P<days>-?[0-9]+)d)?((?P<hours>-?[0-9]+)h)?((?P<minutes>-?[0-9]+)m)?((?P<seconds>-?[0-9]+)s)?((?P<milliseconds>-?[0-9]+)ms)?((?P<microseconds>-?[0-9]+)us)?$
-```
-
-例えば、「1時間30分」という時間を表す場合、以下のようになります。
-```
-1h30m
-```
-
-#### 設定例
-今から2時間以内に放送開始される、公式の将棋番組をタイムシフト予約する場合の設定。
-```toml
-[login]
-mail = "email@example.com"
-password = "password"
-cookieJar = "/path/to/cookiejar"
-
-[search]
-q = "将棋"
-providerType = "official"
-startBefore = "2h"
-```
+そして、\~/.config/tsm/config.toml 及び \~/.config/tsm/filters.json を編集してください。
+設定項目についての説明は config.toml にあります。とりあえずメールとパスワードを設定すれば動作はします。
+必要に応じて `tsm.py -s` を実行し、タイムシフト予約の対象になっている生放送を確認してください。
 
 ## 注意点
 ### niconico の利用規約
@@ -98,4 +32,3 @@ startBefore = "2h"
 ### その他
   - 設定ファイル及び cookieJar のパーミッションは適切に設定してください。
   - ニコニコ生放送のサーバーに過度な負荷を掛けないようにしてください。
-  - 定期実行する場合は、cookieJar を設定することをおすすめします。設定しない場合、他のブラウザソフト等でセッション切れが頻繁に起こります。
