@@ -117,24 +117,24 @@ class TSMachine:
 
     def contents_search_json_filter(self, now=None):
         filters = []
-        if self.filters.get('jsonFilter'):
+        if 'jsonFilter' in self.filters:
             filters.append(self.filters['jsonFilter'])
         for field, before, after in [
                 ('openTime', 'openBefore', 'openAfter'),
                 ('startTime', 'startBefore', 'startAfter'),
                 ('liveEndTime', 'liveEndBefore', 'liveEndAfter'),
         ]:
-            if not self.filters.get(after) and not self.filters.get(before):
+            if after in self.filters and before in self.filters:
                 continue
             if now is None:
                 now = self._niconico.server_time()
 
             f = {'type': 'range', 'field': field}
-            if self.filters.get(after):
+            if after in self.filters:
                 dt = now + parse_timedelta(self.filters[after])
                 f['from'] = dt.isoformat(timespec='seconds')
                 f['include_lower'] = True
-            if self.filters.get(before):
+            if before in self.filters:
                 dt = now + parse_timedelta(self.filters[before])
                 f['to'] = dt.isoformat(timespec='seconds')
                 f['include_upper'] = True
