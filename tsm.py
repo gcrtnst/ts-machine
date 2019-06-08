@@ -119,6 +119,16 @@ class TSMachine:
     def tz(self, value):
         self._niconico.tz = value
 
+    def close_connection(self):
+        return self._niconico.close_connection()
+
+    def __enter__(self):
+        self._niconico.__enter__()
+        return self
+
+    def __exit__(self, *args):
+        return self._niconico.__exit__(*args)
+
     def ts_register(self, live_id):
         self._niconico.ts_register(live_id, overwrite=self.overwrite)
 
@@ -347,25 +357,25 @@ def main():
             sys.exit("error: jsonFilter: {}".format(e))
 
     with lwp_cookiejar(filename=config['login'].get('cookieJar'), filemode=0o600) as jar:
-        tsm = TSMachine()
-        tsm.mail = config['login']['mail']
-        tsm.password = config['login']['password']
-        tsm.cookies = jar
-        tsm.timeout = config['misc'].get('timeout')
-        tsm.user_agent = config['misc'].get('userAgent')
-        tsm.context = config['misc'].get('context')
-        tsm.filters = filters
-        tsm.overwrite = config['misc']['overwrite']
-        tsm.warnings = set()
-        if config['warn']['tsNotSupported']:
-            tsm.warnings.add('ts_not_supported')
-        if config['warn']['tsRegistrationExpired']:
-            tsm.warnings.add('ts_registration_expired')
-        if config['warn']['tsMaxReservation']:
-            tsm.warnings.add('ts_max_reservation')
-        if argv.search is not None:
-            sys.exit(tsm.run_search_only(argv.search))
-        sys.exit(tsm.run_auto_reserve())
+        with TSMachine() as tsm:
+            tsm.mail = config['login']['mail']
+            tsm.password = config['login']['password']
+            tsm.cookies = jar
+            tsm.timeout = config['misc'].get('timeout')
+            tsm.user_agent = config['misc'].get('userAgent')
+            tsm.context = config['misc'].get('context')
+            tsm.filters = filters
+            tsm.overwrite = config['misc']['overwrite']
+            tsm.warnings = set()
+            if config['warn']['tsNotSupported']:
+                tsm.warnings.add('ts_not_supported')
+            if config['warn']['tsRegistrationExpired']:
+                tsm.warnings.add('ts_registration_expired')
+            if config['warn']['tsMaxReservation']:
+                tsm.warnings.add('ts_max_reservation')
+            if argv.search is not None:
+                sys.exit(tsm.run_search_only(argv.search))
+            sys.exit(tsm.run_auto_reserve())
 
 
 if __name__ == '__main__':

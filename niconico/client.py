@@ -72,6 +72,16 @@ class Niconico:
     def cookies(self, value):
         self._session.cookies = value
 
+    def close_connection(self):
+        return self._session.close()
+
+    def __enter__(self):
+        self._session.__enter__()
+        return self
+
+    def __exit__(self, *args):
+        return self._session.__exit__(*args)
+
     def _http_request(self, method, url, *args, **kwargs):
         if 'timeout' not in kwargs or kwargs['timeout'] is None:
             kwargs['timeout'] = self.timeout
