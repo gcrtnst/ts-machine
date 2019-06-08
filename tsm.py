@@ -271,7 +271,7 @@ config_schema = {
             'overwrite': {'type': 'boolean', 'default': False},
             'timeout': {'type': 'number'},
             'userAgent': {'type': 'string'},
-            'context': {'type': 'string', 'default': 'ts-machine (private app)'},
+            'context': {'type': 'string'},
         },
     },
 }
@@ -349,7 +349,7 @@ def main():
         tsm.cookies = jar
         tsm.timeout = config['misc'].get('timeout')
         tsm.user_agent = config['misc'].get('userAgent')
-        tsm.context = config['misc']['context']
+        tsm.context = config['misc'].get('context')
         tsm.filters = filters
         tsm.overwrite = config['misc']['overwrite']
         tsm.warnings = set()
