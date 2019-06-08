@@ -119,23 +119,23 @@ class TSMachine:
         filters = []
         if 'jsonFilter' in self.filters:
             filters.append(self.filters['jsonFilter'])
-        for field, before, after in [
-                ('openTime', 'openBefore', 'openAfter'),
-                ('startTime', 'startBefore', 'startAfter'),
-                ('liveEndTime', 'liveEndBefore', 'liveEndAfter'),
+        for field, timefrom, timeto in [
+                ('openTime', 'openTimeFrom', 'openTimeTo'),
+                ('startTime', 'startTimeFrom', 'startTimeTo'),
+                ('liveEndTime', 'liveEndTimeFrom', 'liveEndTimeTo'),
         ]:
-            if after in self.filters and before in self.filters:
+            if timefrom in self.filters and timeto in self.filters:
                 continue
             if now is None:
                 now = self._niconico.server_time()
 
             f = {'type': 'range', 'field': field}
-            if after in self.filters:
-                dt = now + parse_timedelta(self.filters[after])
+            if timefrom in self.filters:
+                dt = now + parse_timedelta(self.filters[timeto])
                 f['from'] = dt.isoformat(timespec='seconds')
                 f['include_lower'] = True
-            if before in self.filters:
-                dt = now + parse_timedelta(self.filters[before])
+            if timeto in self.filters:
+                dt = now + parse_timedelta(self.filters[timefrom])
                 f['to'] = dt.isoformat(timespec='seconds')
                 f['include_upper'] = True
             filters.append(f)
@@ -243,12 +243,12 @@ config_schema = {
             'targets': {'type': 'list', 'valuesrules': {'type': 'string'}, 'default': ['title', 'description', 'tags']},
             'sort': {'type': 'string', 'default': '+startTime'},
             'jsonFilter': {'type': 'string'},
-            'openBefore': {'type': 'string'},
-            'openAfter': {'type': 'string'},
-            'startBefore': {'type': 'string'},
-            'startAfter': {'type': 'string'},
-            'liveEndBefore': {'type': 'string'},
-            'liveEndAfter': {'type': 'string'},
+            'openTimeFrom': {'type': 'string'},
+            'openTimeTo': {'type': 'string'},
+            'startTimeFrom': {'type': 'string'},
+            'startTimeTo': {'type': 'string'},
+            'liveEndTimeFrom': {'type': 'string'},
+            'liveEndTimeTo': {'type': 'string'},
             'ppv': {'type': 'boolean'},
         },
     },
