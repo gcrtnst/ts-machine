@@ -131,11 +131,11 @@ class TSMachine:
 
             f = {'type': 'range', 'field': field}
             if timefrom in self.filters:
-                dt = now + parse_timedelta(self.filters[timeto])
+                dt = now + parse_timedelta(self.filters[timefrom])
                 f['from'] = dt.isoformat(timespec='seconds')
                 f['include_lower'] = True
             if timeto in self.filters:
-                dt = now + parse_timedelta(self.filters[timefrom])
+                dt = now + parse_timedelta(self.filters[timeto])
                 f['to'] = dt.isoformat(timespec='seconds')
                 f['include_upper'] = True
             filters.append(f)
