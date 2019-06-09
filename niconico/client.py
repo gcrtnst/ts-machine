@@ -260,10 +260,7 @@ class Niconico:
         live_id = utils.str_id('lv', live_id)
         channel_id = utils.str_id('ch', channel_id)
         resp = self._http_get('https://ch.nicovideo.jp/ppv_live/' + channel_id + '/' + live_id)
-        if resp.status_code == 404 or resp.status_code == 410:
-            return False
-        _http_raise_for_status(resp)
-        return True
+        return resp.status_code == 200
 
     def server_time(self):
         resp = self._http_get('https://live.nicovideo.jp/api/getservertime')
