@@ -1,5 +1,15 @@
 {
-	"type": "equal",
-	"field": "timeshiftEnabled",
-	"value": true
+	"type": "and",
+	"filters": [
+		{
+			"type": "equal",
+			"field": "liveStatus",
+			"value": "reserved"
+		},
+		{
+			"type": "equal",
+			"field": "timeshiftEnabled",
+			"value": true
+		}
+	]
 }
