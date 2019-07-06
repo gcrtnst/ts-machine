@@ -58,7 +58,8 @@ class TestNiconico(unittest.TestCase):
             'filters[startTime][gt]': '0001-01-01T00:00:00',
             'filters[startTime][lt]': '0001-01-02T00:00:00',
         }
-        self.assertEqual(niconico.client._contents_search_filters_data(filters), data)
+        self.assertEqual(
+            niconico.client._contents_search_filters_data(filters), data)
 
     def test_contents_search_filters_value(self):
         for c in [
@@ -68,32 +69,37 @@ class TestNiconico(unittest.TestCase):
                 (None, 'null'),
                 (0, '0'),
         ]:
-            self.assertEqual(niconico.client._contents_search_filters_value(c[0]), c[1])
+            self.assertEqual(
+                niconico.client._contents_search_filters_value(c[0]), c[1])
 
     def test_http_request(self):
         n = Niconico()
         n.timeout = None
         n._session = Mock(spec_set=n._session)
         n._http_request('method', 'url')
-        self.assertEqual(n._session.mock_calls, [call.request('method', 'url', timeout=None)])
+        self.assertEqual(n._session.mock_calls, [
+                         call.request('method', 'url', timeout=None)])
 
         n = Niconico()
         n.timeout = 1
         n._session = Mock(spec_set=n._session)
         n._http_request('method', 'url')
-        self.assertEqual(n._session.mock_calls, [call.request('method', 'url', timeout=1)])
+        self.assertEqual(n._session.mock_calls, [
+                         call.request('method', 'url', timeout=1)])
 
         n = Niconico()
         n.timeout = None
         n._session = Mock(spec_set=n._session)
         n._http_request('method', 'url', timeout=2)
-        self.assertEqual(n._session.mock_calls, [call.request('method', 'url', timeout=2)])
+        self.assertEqual(n._session.mock_calls, [
+                         call.request('method', 'url', timeout=2)])
 
         n = Niconico()
         n.timeout = 1
         n._session = Mock(spec_set=n._session)
         n._http_request('method', 'url', timeout=2)
-        self.assertEqual(n._session.mock_calls, [call.request('method', 'url', timeout=2)])
+        self.assertEqual(n._session.mock_calls, [
+                         call.request('method', 'url', timeout=2)])
 
     def test_login(self):
         n = Niconico()
@@ -112,10 +118,11 @@ class TestNiconico(unittest.TestCase):
         n._http_request = Mock(spec_set=n._http_request, return_value=resp)
         with self.assertRaises(LoginFailed):
             n.login()
-        self.assertEqual(n._http_request.mock_calls, [call('post', 'https://account.nicovideo.jp/api/v1/login', data={
-            'mail_tel': 'mail@example.com',
-            'password': 'password',
-        }, allow_redirects=False)])
+        self.assertEqual(n._http_request.mock_calls, [
+            call('post', 'https://account.nicovideo.jp/api/v1/login', data={
+                'mail_tel': 'mail@example.com',
+                'password': 'password',
+            }, allow_redirects=False)])
         self.assertEqual(resp.mock_calls, [call.raise_for_status()])
 
         cookie = Mock()
@@ -127,10 +134,11 @@ class TestNiconico(unittest.TestCase):
         n.password = 'password'
         n._http_request = Mock(spec_set=n._http_request, return_value=resp)
         n.login()
-        self.assertEqual(n._http_request.mock_calls, [call('post', 'https://account.nicovideo.jp/api/v1/login', data={
-            'mail_tel': 'mail@example.com',
-            'password': 'password',
-        }, allow_redirects=False)])
+        self.assertEqual(n._http_request.mock_calls, [
+            call('post', 'https://account.nicovideo.jp/api/v1/login', data={
+                'mail_tel': 'mail@example.com',
+                'password': 'password',
+            }, allow_redirects=False)])
         self.assertEqual(resp.mock_calls, [call.raise_for_status()])
 
 

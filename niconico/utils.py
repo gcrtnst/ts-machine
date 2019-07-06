@@ -17,7 +17,9 @@ def parse_id(content_id):
 def int_id(prefix, content_id):
     p, i = parse_id(content_id)
     if p is not None and p != prefix:
-        raise InvalidContentID('expected "' + prefix + '" for content id prefix, found "' + p + '"')
+        raise InvalidContentID(
+            'expected "' + prefix + '" for content id prefix, '
+            'found "' + p + '"')
     return i
 
 

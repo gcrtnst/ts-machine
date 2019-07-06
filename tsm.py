@@ -19,7 +19,11 @@ from niconico import (CommunicationError, ContentSearchError, LoginFailed,
                       Niconico, Timeout, TSAlreadyRegistered, TSMaxReservation,
                       TSNotSupported, TSRegistrationExpired)
 
-_re_timedelta = re.compile(r'^(?P<minus>-?)((?P<weeks>[0-9]+)w)?((?P<days>[0-9]+)d)?((?P<hours>[0-9]+)h)?((?P<minutes>[0-9]+)m)?((?P<seconds>[0-9]+)s)?((?P<milliseconds>[0-9]+)ms)?((?P<microseconds>[0-9]+)us)?$')
+_re_timedelta = re.compile(r'^(?P<minus>-?)((?P<weeks>[0-9]+)w)?'
+                           r'((?P<days>[0-9]+)d)?((?P<hours>[0-9]+)h)?'
+                           r'((?P<minutes>[0-9]+)m)?((?P<seconds>[0-9]+)s)?'
+                           r'((?P<milliseconds>[0-9]+)ms)?'
+                           r'((?P<microseconds>[0-9]+)us)?$')
 
 
 def parse_timedelta(s):
@@ -28,7 +32,8 @@ def parse_timedelta(s):
         raise ValueError('invalid timedelta: "{}"'.format(s))
 
     kwargs = {}
-    for key in ['weeks', 'days', 'hours', 'minutes', 'seconds', 'milliseconds', 'microseconds']:
+    for key in ['weeks', 'days', 'hours', 'minutes',
+                'seconds', 'milliseconds', 'microseconds']:
         value = match.group(key)
         if value is not None:
             kwargs[key] = int(value)
@@ -59,7 +64,8 @@ class TSMachine:
 
         self.filters = {}
         self.overwrite = False
-        self.warnings = {'ts_not_supported', 'ts_max_reservation', 'ts_registration_expired'}
+        self.warnings = {'ts_not_supported',
+                         'ts_max_reservation', 'ts_registration_expired'}
         self.stdout = sys.stdout
         self.stderr = sys.stderr
 
@@ -166,7 +172,8 @@ class TSMachine:
     def match_ppv(self, live_id, channel_id):
         if 'ppv' not in self.filters:
             return True
-        is_ppv = channel_id is not None and self._niconico.is_ppv_live(live_id, channel_id)
+        is_ppv = (channel_id is not None
+                  and self._niconico.is_ppv_live(live_id, channel_id))
         return is_ppv == self.filters['ppv']
 
     def iter_search(self, fields=set()):
@@ -179,11 +186,11 @@ class TSMachine:
             targets=self.filters['targets'],
             fields=search_fields,
             json_filter=self.contents_search_json_filter(),
-            sort=self.filters['sort'],
-        )
+            sort=self.filters['sort'])
 
         for content in iter_contents:
-            if 'ppv' in self.filters and not self.match_ppv(content['contentId'], content['channelId']):
+            if 'ppv' in self.filters and not self.match_ppv(
+                    content['contentId'], content['channelId']):
                 continue
             yield {k: v for k, v in content.items() if k in fields}
 
@@ -257,7 +264,8 @@ config_schema = {
         'required': True,
         'schema': {
             'q': {'type': 'string', 'required': True},
-            'targets': {'type': 'list', 'valuesrules': {'type': 'string'}, 'default': ['title', 'description', 'tags']},
+            'targets': {'type': 'list', 'valuesrules': {'type': 'string'},
+                        'default': ['title', 'description', 'tags']},
             'sort': {'type': 'string', 'default': '+startTime'},
             'jsonFilter': {'type': 'string'},
             'openTimeFrom': {'type': 'string'},
@@ -310,9 +318,11 @@ def load_config(path):
 
     basepath = path.parent
     if 'cookieJar' in config['login']:
-        config['login']['cookieJar'] = Path(basepath, config['login']['cookieJar'])
+        config['login']['cookieJar'] = Path(
+            basepath, config['login']['cookieJar'])
     if 'jsonFilter' in config['search']:
-        config['search']['jsonFilter'] = Path(basepath, config['search']['jsonFilter'])
+        config['search']['jsonFilter'] = Path(
+            basepath, config['search']['jsonFilter'])
     return config
 
 
@@ -335,8 +345,15 @@ def lwp_cookiejar(filename=None, filemode=0o666):
 
 def main():
     argp = ArgumentParser()
-    argp.add_argument('-c', '--config', type=Path, default=Path('~', '.config', 'tsm', 'config.toml').expanduser(), help='TOML-formatted configuration file (default: %(default)s)')
-    argp.add_argument('-s', '--search', type=int, nargs='?', const=10, metavar='N', help='search only mode; N specifies maximum number of programs to search (default: %(const)s)')
+    argp.add_argument(
+        '-c', '--config', type=Path,
+        default=Path('~', '.config', 'tsm', 'config.toml').expanduser(),
+        help='TOML-formatted configuration file (default: %(default)s)')
+    argp.add_argument(
+        '-s', '--search', type=int, nargs='?', const=10, metavar='N',
+        help=('search only mode; \n'
+              'N specifies maximum number of programs to search \n'
+              '(default: %(const)s)'))
     argv = argp.parse_args()
 
     try:
@@ -352,30 +369,31 @@ def main():
             with Path(config['search']['jsonFilter']).open() as f:
                 filters['jsonFilter'] = json.load(f)
         except OSError as e:
-            sys.exit("error: jsonFilter '{}': {}".format(config['search']['jsonFilter'], e.strerror))
+            sys.exit("error: jsonFilter '{}': {}".format(
+                config['search']['jsonFilter'], e.strerror))
         except JSONDecodeError as e:
             sys.exit("error: jsonFilter: {}".format(e))
 
-    with lwp_cookiejar(filename=config['login'].get('cookieJar'), filemode=0o600) as jar:
-        with TSMachine() as tsm:
-            tsm.mail = config['login']['mail']
-            tsm.password = config['login']['password']
-            tsm.cookies = jar
-            tsm.timeout = config['misc'].get('timeout')
-            tsm.user_agent = config['misc'].get('userAgent')
-            tsm.context = config['misc'].get('context')
-            tsm.filters = filters
-            tsm.overwrite = config['misc']['overwrite']
-            tsm.warnings = set()
-            if config['warn']['tsNotSupported']:
-                tsm.warnings.add('ts_not_supported')
-            if config['warn']['tsRegistrationExpired']:
-                tsm.warnings.add('ts_registration_expired')
-            if config['warn']['tsMaxReservation']:
-                tsm.warnings.add('ts_max_reservation')
-            if argv.search is not None:
-                sys.exit(tsm.run_search_only(argv.search))
-            sys.exit(tsm.run_auto_reserve())
+    with lwp_cookiejar(filename=config['login'].get('cookieJar'),
+                       filemode=0o600) as jar, TSMachine() as tsm:
+        tsm.mail = config['login']['mail']
+        tsm.password = config['login']['password']
+        tsm.cookies = jar
+        tsm.timeout = config['misc'].get('timeout')
+        tsm.user_agent = config['misc'].get('userAgent')
+        tsm.context = config['misc'].get('context')
+        tsm.filters = filters
+        tsm.overwrite = config['misc']['overwrite']
+        tsm.warnings = set()
+        if config['warn']['tsNotSupported']:
+            tsm.warnings.add('ts_not_supported')
+        if config['warn']['tsRegistrationExpired']:
+            tsm.warnings.add('ts_registration_expired')
+        if config['warn']['tsMaxReservation']:
+            tsm.warnings.add('ts_max_reservation')
+        if argv.search is not None:
+            sys.exit(tsm.run_search_only(argv.search))
+        sys.exit(tsm.run_auto_reserve())
 
 
 if __name__ == '__main__':
