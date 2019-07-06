@@ -10,7 +10,7 @@ password = "password"
 # 指定されなかった場合、クッキーは保存されません。
 cookieJar = "cookiejar.txt"
 
-[search]
+[[search]]
 # 一部、コンテンツ検索 API のパラメータをそのまま指定する項目があります。
 # 必要に応じてコンテンツ検索 API ドキュメントを参照してください。
 # https://site.nicovideo.jp/search-api-docs/search.html

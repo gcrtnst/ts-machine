@@ -62,7 +62,7 @@ class TSMachine:
         self._niconico = Niconico()
         self._niconico.tz = dateutil.tz.gettz()
 
-        self.filters = {}
+        self.filter_list = {}
         self.overwrite = False
         self.warnings = {'ts_not_supported',
                          'ts_max_reservation', 'ts_registration_expired'}
@@ -138,61 +138,63 @@ class TSMachine:
     def ts_register(self, live_id):
         self._niconico.ts_register(live_id, overwrite=self.overwrite)
 
-    def contents_search_json_filter(self, now=None):
-        filters = []
-        if 'jsonFilter' in self.filters:
-            filters.append(self.filters['jsonFilter'])
+    def contents_search_json_filter(self, vfilter, now=None):
+        json_filters = []
+        if 'jsonFilter' in vfilter:
+            json_filters.append(vfilter['jsonFilter'])
         for field, timefrom, timeto in [
                 ('openTime', 'openTimeFrom', 'openTimeTo'),
                 ('startTime', 'startTimeFrom', 'startTimeTo'),
                 ('liveEndTime', 'liveEndTimeFrom', 'liveEndTimeTo'),
         ]:
-            if timefrom not in self.filters and timeto not in self.filters:
+            if timefrom not in vfilter and timeto not in vfilter:
                 continue
             if now is None:
                 now = self._niconico.server_time()
 
-            f = {'type': 'range', 'field': field}
-            if timefrom in self.filters:
-                dt = now + parse_timedelta(self.filters[timefrom])
-                f['from'] = dt.isoformat(timespec='seconds')
-                f['include_lower'] = True
-            if timeto in self.filters:
-                dt = now + parse_timedelta(self.filters[timeto])
-                f['to'] = dt.isoformat(timespec='seconds')
-                f['include_upper'] = True
-            filters.append(f)
+            jf = {'type': 'range', 'field': field}
+            if timefrom in vfilter:
+                dt = now + parse_timedelta(vfilter[timefrom])
+                jf['from'] = dt.isoformat(timespec='seconds')
+                jf['include_lower'] = True
+            if timeto in vfilter:
+                dt = now + parse_timedelta(vfilter[timeto])
+                jf['to'] = dt.isoformat(timespec='seconds')
+                jf['include_upper'] = True
+            json_filters.append(jf)
 
-        if len(filters) == 0:
+        if len(json_filters) == 0:
             return None
-        if len(filters) == 1:
-            return filters[0]
-        return {'type': 'and', 'filters': filters}
+        if len(json_filters) == 1:
+            return json_filters[0]
+        return {'type': 'and', 'filters': json_filters}
 
-    def match_ppv(self, live_id, channel_id):
-        if 'ppv' not in self.filters:
+    def match_ppv(self, vfilter, live_id, channel_id):
+        if 'ppv' not in vfilter:
             return True
-        is_ppv = (channel_id is not None
-                  and self._niconico.is_ppv_live(live_id, channel_id))
-        return is_ppv == self.filters['ppv']
+        return vfilter['ppv'] == (
+            channel_id is not None
+            and self._niconico.is_ppv_live(live_id, channel_id))
 
-    def iter_search(self, fields=set()):
-        search_fields = {'contentId'} | set(fields)
-        if 'ppv' in self.filters:
-            search_fields.add('channelId')
+    def iter_search(self, vfilter, fields=set()):
+        search_fields = {'contentId', 'channelId'} | set(fields)
         iter_contents = self._niconico.contents_search(
-            self.filters['q'],
+            vfilter['q'],
             service='live',
-            targets=self.filters['targets'],
+            targets=vfilter['targets'],
             fields=search_fields,
-            json_filter=self.contents_search_json_filter(),
-            sort=self.filters['sort'])
+            json_filter=self.contents_search_json_filter(vfilter),
+            sort=vfilter['sort'])
 
         for content in iter_contents:
-            if 'ppv' in self.filters and not self.match_ppv(
-                    content['contentId'], content['channelId']):
+            if not self.match_ppv(vfilter,
+                                  content['contentId'], content['channelId']):
                 continue
             yield {k: v for k, v in content.items() if k in fields}
+
+    def iter_search_all(self, fields=set()):
+        for vfilter in self.filter_list:
+            yield from self.iter_search(vfilter, fields=fields)
 
     def print(self, *args, **kwargs):
         kwargs['file'] = self.stdout
@@ -215,16 +217,16 @@ class TSMachine:
 
     @_tsm_run
     def run_search_only(self, n):
-        iter_search = self.iter_search(fields={'contentId', 'title'})
-        iter_search = itertools.islice(iter_search, n)
-        for content in iter_search:
+        iter_search_all = self.iter_search_all(fields={'contentId', 'title'})
+        iter_search_all = itertools.islice(iter_search_all, n)
+        for content in iter_search_all:
             self.print(content['contentId'] + ': ' + content['title'])
         return 0
 
     @_tsm_run
     def run_auto_reserve(self):
         ts_list_before = self._niconico.ts_list()
-        for content in self.iter_search(fields={'contentId'}):
+        for content in self.iter_search_all(fields={'contentId'}):
             if content['contentId'] in (ts['vid'] for ts in ts_list_before):
                 continue
             try:
@@ -260,21 +262,24 @@ config_schema = {
         },
     },
     'search': {
-        'type': 'dict',
-        'required': True,
+        'type': 'list',
+        'default': [],
         'schema': {
-            'q': {'type': 'string', 'required': True},
-            'targets': {'type': 'list', 'valuesrules': {'type': 'string'},
-                        'default': ['title', 'description', 'tags']},
-            'sort': {'type': 'string', 'default': '+startTime'},
-            'jsonFilter': {'type': 'string'},
-            'openTimeFrom': {'type': 'string'},
-            'openTimeTo': {'type': 'string'},
-            'startTimeFrom': {'type': 'string'},
-            'startTimeTo': {'type': 'string'},
-            'liveEndTimeFrom': {'type': 'string'},
-            'liveEndTimeTo': {'type': 'string'},
-            'ppv': {'type': 'boolean'},
+            'type': 'dict',
+            'schema': {
+                'q': {'type': 'string', 'required': True},
+                'targets': {'type': 'list', 'valuesrules': {'type': 'string'},
+                            'default': ['title', 'description', 'tags']},
+                'sort': {'type': 'string', 'default': '+startTime'},
+                'jsonFilter': {'type': 'string'},
+                'openTimeFrom': {'type': 'string'},
+                'openTimeTo': {'type': 'string'},
+                'startTimeFrom': {'type': 'string'},
+                'startTimeTo': {'type': 'string'},
+                'liveEndTimeFrom': {'type': 'string'},
+                'liveEndTimeTo': {'type': 'string'},
+                'ppv': {'type': 'boolean'},
+            },
         },
     },
     'warn': {
@@ -320,9 +325,9 @@ def load_config(path):
     if 'cookieJar' in config['login']:
         config['login']['cookieJar'] = Path(
             basepath, config['login']['cookieJar'])
-    if 'jsonFilter' in config['search']:
-        config['search']['jsonFilter'] = Path(
-            basepath, config['search']['jsonFilter'])
+    for search in config['search']:
+        if 'jsonFilter' in search:
+            search['jsonFilter'] = Path(basepath, search['jsonFilter'])
     return config
 
 
@@ -363,14 +368,16 @@ def main():
     except ConfigError as e:
         sys.exit('error: ' + str(e))
 
-    filters = config['search'].copy()
-    if 'jsonFilter' in config['search']:
+    filter_list = config['search'].copy()
+    for i in range(len(filter_list)):
+        if 'jsonFilter' not in config['search'][i]:
+            continue
         try:
-            with Path(config['search']['jsonFilter']).open() as f:
-                filters['jsonFilter'] = json.load(f)
+            with Path(config['search'][i]['jsonFilter']).open() as f:
+                filter_list[i]['jsonFilter'] = json.load(f)
         except OSError as e:
             sys.exit("error: jsonFilter '{}': {}".format(
-                config['search']['jsonFilter'], e.strerror))
+                config['search'][i]['jsonFilter'], e.strerror))
         except JSONDecodeError as e:
             sys.exit("error: jsonFilter: {}".format(e))
 
@@ -382,7 +389,7 @@ def main():
         tsm.timeout = config['misc'].get('timeout')
         tsm.user_agent = config['misc'].get('userAgent')
         tsm.context = config['misc'].get('context')
-        tsm.filters = filters
+        tsm.filter_list = filter_list
         tsm.overwrite = config['misc']['overwrite']
         tsm.warnings = set()
         if config['warn']['tsNotSupported']:
