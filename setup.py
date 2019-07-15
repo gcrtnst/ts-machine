@@ -29,7 +29,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'beautifulsoup4>=4.7.1',
-        'cerberus>=1.3.1',
+        'Cerberus>=1.3.1',
         'html5lib>=1.0.1',
         'python-dateutil>=2.8.0',
         'requests>=2.22.0',
