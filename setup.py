@@ -26,6 +26,10 @@ setuptools.setup(
         'Topic :: Multimedia :: Video',
     ],
     keywords='niconico time-shift',
+    project_urls={
+        'Source': 'https://github.com/gcrtnst/ts-machine',
+        'Tracker': 'https://github.com/gcrtnst/ts-machine/issues',
+    },
     packages=setuptools.find_packages(),
     install_requires=[
         'beautifulsoup4>=4.7.1',
