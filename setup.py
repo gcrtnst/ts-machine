@@ -6,7 +6,7 @@ with open('README.md', 'r') as fp:
 
 setuptools.setup(
     name='ts_machine',
-    version='2019.7.15',
+    version='2019.7.16',
     description='ニコニコ生放送のタイムシフト予約を自動化',
     long_description=long_description,
     long_description_content_type='text/markdown',
