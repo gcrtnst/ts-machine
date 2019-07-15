@@ -27,7 +27,6 @@ setuptools.setup(
     ],
     keywords='niconico time-shift',
     packages=setuptools.find_packages(),
-    py_modules='tsm',
     install_requires=[
         'beautifulsoup4>=4.7.1',
         'cerberus>=1.3.1',
