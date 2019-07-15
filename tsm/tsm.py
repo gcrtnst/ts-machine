@@ -6,9 +6,9 @@ from datetime import timedelta
 
 import dateutil.tz
 
-from niconico import (CommunicationError, ContentSearchError, LoginFailed,
-                      Niconico, Timeout, TSAlreadyRegistered, TSMaxReservation,
-                      TSNotSupported, TSRegistrationExpired)
+from .niconico import (CommunicationError, ContentSearchError, LoginFailed,
+                       Niconico, Timeout, TSAlreadyRegistered,
+                       TSMaxReservation, TSNotSupported, TSRegistrationExpired)
 
 _re_timedelta = re.compile(r'^(?P<minus>-?)((?P<weeks>[0-9]+)w)?'
                            r'((?P<days>[0-9]+)d)?((?P<hours>[0-9]+)h)?'
