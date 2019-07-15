@@ -5,8 +5,8 @@ ts\_machine はニコニコ生放送のタイムシフト予約を自動化す�
 
 ## セットアップ
 ### インストール
-```
-pip install git+https://github.com/gcrtnst/ts_machine.git
+```sh
+pip install ts_machine
 ```
 
 ### 設定ファイルの用意
