@@ -96,8 +96,8 @@ timeout = 300
 
 # HTTP リクエストの User-Agent ヘッダ。
 # 指定されなかった場合、User-Agent ヘッダは送信されません。
-userAgent = "ts-machine (https://github.com/gcrtnst/ts-machine)"
+userAgent = "ts_machine (https://github.com/gcrtnst/ts_machine)"
 
 # コンテンツ検索APIの _context クエリパラメータ。
 # 指定されなかった場合、_context クエリパラメータは送信されません。
-context = "ts-machine (https://github.com/gcrtnst/ts-machine)"
+context = "ts_machine (https://github.com/gcrtnst/ts_machine)"

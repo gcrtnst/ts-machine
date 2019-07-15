@@ -1,12 +1,12 @@
-# ts-machine
-ts-machine はニコニコ生放送のタイムシフト予約を自動化するためのツールです。
+# ts\_machine
+ts\_machine はニコニコ生放送のタイムシフト予約を自動化するためのツールです。
 ニコニコ生放送内を検索し、ヒットした番組をタイムシフト予約します。
 一般会員での利用を想定しています。
 
 ## セットアップ
 ### インストール
 ```
-pip install git+https://github.com/gcrtnst/ts-machine.git
+pip install git+https://github.com/gcrtnst/ts_machine.git
 ```
 
 ### 設定ファイルの用意

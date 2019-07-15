@@ -5,12 +5,12 @@ with open('README.md', 'r') as fp:
     long_description = fp.read()
 
 setuptools.setup(
-    name='ts-machine',
+    name='ts_machine',
     version='2019.7.15',
     description='ニコニコ生放送のタイムシフト予約を自動化',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/gcrtnst/ts-machine',
+    url='https://github.com/gcrtnst/ts_machine',
     author='gcrtnst',
     license='MIT',
     classifiers=[
@@ -27,8 +27,8 @@ setuptools.setup(
     ],
     keywords='niconico time-shift',
     project_urls={
-        'Source': 'https://github.com/gcrtnst/ts-machine',
-        'Tracker': 'https://github.com/gcrtnst/ts-machine/issues',
+        'Source': 'https://github.com/gcrtnst/ts_machine',
+        'Tracker': 'https://github.com/gcrtnst/ts_machine/issues',
     },
     packages=setuptools.find_packages(),
     install_requires=[
