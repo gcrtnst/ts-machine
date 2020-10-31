@@ -232,7 +232,10 @@ class Niconico:
                 'expire': None
             }
             if expire != 0:
-                item['expire'] = datetime.fromtimestamp(expire, tz=self.tz)
+                try:
+                    item['expire'] = datetime.fromtimestamp(expire, tz=self.tz)
+                except OverflowError:
+                    pass
             items.append(item)
         return items
 
